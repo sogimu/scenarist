@@ -8,13 +8,17 @@ import subprocess
 import os.path
 import platform
 
-from src.runner import Runner, Info
+from src.info import Info
+from src.utility import getScriptsVariants, chooseScriptVariant
+from src.runner import runScript
+from src.config import bcolors, scriptNameEnding
+
 version = "0.1.0"
 
-defaultScriptName = platform.dist()[0]+'_'+platform.dist()[1]+ ".script"
+info = Info()
 
 def os_name_parse(name):
-    if not(bool(re.match("^(.+_.+)$", name))):
+    if not(bool(re.match("^(.+_.+" + scriptNameEnding + ")$", name))):
         msg = "%r bad format " % name
         raise argparse.ArgumentTypeError(msg)
     return name
@@ -61,8 +65,8 @@ def createParser ():
     run_group.add_argument ('targets', type=str, nargs='+',
             help = 'Specify targets in script to run. The script will be choosen by current platform name or with help argument -os')
 
-    run_group.add_argument ('-os', type=os_name_parse, required=False,
-            help = 'Specify script for which os run. Example: Ubuntu_16.04. Format: ^(.+_.+)$. Default script name on this platform is ' + defaultScriptName)
+    run_group.add_argument ('-script', type=os_name_parse, required=False,
+            help = 'Specify script name for which os run. Example: Ubuntu_16.04. Format: ^(.+_.+)$. Default script name on this platform is ' + info.fullPlatformName())
 
     run_group.add_argument ('-dir', type=path_to_dir, default="./scripts/", required=False,
             help = 'Path to directory with scripts. Example: ./scripts/')
@@ -86,8 +90,29 @@ if __name__ == '__main__':
         # print namespace.os
         # print namespace.targets
         # print namespace.dir
-        runner = Runner(namespace.dir)
-        runner.run(namespace.targets, namespace.os)
+        info = Info()
+        fullPlatformName = info.fullPlatformName()
+
+        if namespace.dir == None:
+            userScriptsDir = scriptsDir
+        else:
+            userScriptsDir = namespace.dir
+
+        if namespace.script == None:
+            scriptsVariants = getScriptsVariants(userScriptsDir)
+            scriptVariant = chooseScriptVariant(fullPlatformName, scriptsVariants)
+        else:
+            scriptVariant = namespace.script[:-1 * len(scriptNameEnding)]
+
+        if userScriptsDir != None and scriptVariant != None:
+            pathToScript = os.path.join(userScriptsDir, scriptVariant + scriptNameEnding)
+            if os.path.isfile(pathToScript):
+                print bcolors.HEADER + "Run targets of script " + pathToScript + bcolors.ENDC
+                runScript(namespace.targets, pathToScript)
+            else:
+                print bcolors.FAIL + "Script " + pathToScript + " not found!" + bcolors.ENDC
+        else:
+            print bcolors.WARNING + "No script for current platform" + bcolors.ENDC
         
     elif namespace.command == "info":
         info = Info()

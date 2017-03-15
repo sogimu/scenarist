@@ -2,8 +2,8 @@
  
 import os
 import platform
-
-scriptNameEnding = ".script"
+import src.utility
+from src.config import scriptNameEnding
 
 class Info:
     def osName(self):

@@ -10,18 +10,10 @@ from subprocess import call
 import subprocess
 import shlex
 
-from os.path import exists
-from os import makedirs
+from os.path import exists, isfile, join
+from os import makedirs, listdir
 
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+from src.config import scriptNameEnding, bcolors
 
 class cd:
     """Context manager for changing the current working directory"""
@@ -41,3 +33,22 @@ class cd:
 def run(cmd):
     print bcolors.BOLD + "> " + cmd + bcolors.ENDC
     subprocess.call(shlex.split(cmd))
+
+def chooseScriptVariant(systemName, scriptsNames):
+    sizeOfMatch = {}
+    for scriptsName in scriptsNames:
+        match = re.match("^(" + scriptsName + ")", systemName)
+        if bool(match):
+            sizeOfMatch[scriptsName]=len(match.group())
+    if len(sizeOfMatch) == 0:
+        return None
+    return max(sizeOfMatch, key=sizeOfMatch.get)
+
+def getScriptsVariants(scriptsDir):
+    onlyfiles = [f for f in listdir(scriptsDir) if isfile(join(scriptsDir, f))]
+    scriptsNames = []
+    for fileName in onlyfiles:
+        match = re.match("^(.*" + scriptNameEnding + ")$", fileName)
+        if bool(match):
+            scriptsNames.append(fileName[:-1 * len(scriptNameEnding)])
+    return scriptsNames
