@@ -13,7 +13,7 @@ import shlex
 from os.path import exists, isfile, join
 from os import makedirs, listdir
 
-from src.config import scriptNameEnding, bcolors
+from Scenarist.src.config import scriptNameEnding, bcolors
 
 class cd:
     """Context manager for changing the current working directory"""
