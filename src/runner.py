@@ -19,8 +19,6 @@ from src.info import Info
 from src.config import bcolors
 
 def getTargets(pathToScript):
-    print pathToScript
-
     with open(pathToScript) as f:
         content = f.readlines()
     # you may also want to remove whitespace characters like `\n` at the end of each line
@@ -53,15 +51,10 @@ def getTargets(pathToScript):
     return targets
 
 def runScript(targets, pathToScript):
-    # if pathToScript == None:
-    #     info = Info()
-    #     pathToScript = info.defaultScriptName()
-    print "run targets " + ' '.join(targets) + " from script " + pathToScript
-
     targetsCode = getTargets(pathToScript)
     for target in targets:
         if target in targetsCode:
-            print bcolors.OKGREEN + "\nTarget " + target + " ..." + bcolors.ENDC
+            print bcolors.OKGREEN + "\nRun target " + target + " ..." + bcolors.ENDC
             exec(targetsCode[target])
         else:
             print bcolors.WARNING + "Warning: Target " + target + " not found." + bcolors.ENDC

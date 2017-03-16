@@ -17,15 +17,15 @@ version = "0.1.0"
 
 info = Info()
 
-def os_name_parse(name):
-    if not(bool(re.match("^(.+_.+" + scriptNameEnding + ")$", name))):
-        msg = "%r bad format " % name
+def script_name_parse(name):
+    if not(bool(re.match("^(.+" + scriptNameEnding + ")$", name))):
+        msg = "%r bad script name " % name
         raise argparse.ArgumentTypeError(msg)
     return name
 
 def path_to_dir(path):
     if not(bool(os.path.isdir(path))):
-        msg = "%r bad format " % path
+        msg = "%r no such dir " % path
         raise argparse.ArgumentTypeError(msg)
     return path
 
@@ -65,8 +65,8 @@ def createParser ():
     run_group.add_argument ('targets', type=str, nargs='+',
             help = 'Specify targets in script to run. The script will be choosen by current platform name or with help argument -os')
 
-    run_group.add_argument ('-script', type=os_name_parse, required=False,
-            help = 'Specify script name for which os run. Example: Ubuntu_16.04. Format: ^(.+_.+)$. Default script name on this platform is ' + info.fullPlatformName())
+    run_group.add_argument ('-script', type=script_name_parse, required=False,
+            help = "Specify script name for which os run. Example: Ubuntu_16.04. Format: " + "^(.+" + scriptNameEnding + ")$" + ". Default script name on this platform is " + info.fullPlatformName())
 
     run_group.add_argument ('-dir', type=path_to_dir, default="./scripts/", required=False,
             help = 'Path to directory with scripts. Example: ./scripts/')
@@ -107,7 +107,8 @@ if __name__ == '__main__':
         if userScriptsDir != None and scriptVariant != None:
             pathToScript = os.path.join(userScriptsDir, scriptVariant + scriptNameEnding)
             if os.path.isfile(pathToScript):
-                print bcolors.HEADER + "Run targets of script " + pathToScript + bcolors.ENDC
+                print bcolors.HEADER + "Run targets of script: " + pathToScript + bcolors.ENDC
+                print '\n'.join(namespace.targets)
                 runScript(namespace.targets, pathToScript)
             else:
                 print bcolors.FAIL + "Script " + pathToScript + " not found!" + bcolors.ENDC
