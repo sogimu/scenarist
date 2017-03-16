@@ -4,7 +4,7 @@ project("scenarist")
 
 set (Scenarist_VERSION_MAJOR 0)
 set (Scenarist_VERSION_MINOR 5)
-set (Scenarist_VERSION_PATCH 0)
+set (Scenarist_VERSION_PATCH 2)
 
 INSTALL(DIRECTORY "Scenarist/"  DESTINATION "bin/Scenarist")
 INSTALL(PROGRAMS "scenarist" DESTINATION "bin/")

@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python2.7
 # -*- coding: UTF-8 -*-
  
 import sys
@@ -13,7 +13,7 @@ from Scenarist.src.utility import getScriptsVariants, chooseScriptVariant
 from Scenarist.src.runner import runScript
 from Scenarist.src.config import bcolors, scriptNameEnding
 
-version = "0.1.0"
+version = "0.5.2"
 
 info = Info()
 

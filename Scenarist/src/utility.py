@@ -32,7 +32,9 @@ class cd:
 
 def run(cmd):
     print bcolors.BOLD + "> " + cmd + bcolors.ENDC
-    subprocess.call(shlex.split(cmd))
+    retCode = subprocess.call(shlex.split(cmd))
+    if retCode != 0:
+        raise Exception("Cmd: " + cmd + " fail with code " + retCode);
 
 def chooseScriptVariant(systemName, scriptsNames):
     sizeOfMatch = {}
