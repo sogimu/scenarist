@@ -109,15 +109,19 @@ if __name__ == '__main__':
             if os.path.isfile(pathToScript):
                 print bcolors.HEADER + "Run targets of script: " + pathToScript + bcolors.ENDC
                 print '\n'.join(namespace.targets)
+                sys.stdout.flush()
                 runScript(namespace.targets, pathToScript)
             else:
                 print bcolors.FAIL + "Script " + pathToScript + " not found!" + bcolors.ENDC
+                sys.stdout.flush()
         else:
             print bcolors.WARNING + "No script for current platform" + bcolors.ENDC
+            sys.stdout.flush()
         
     elif namespace.command == "info":
         info = Info()
         print info.about_platform()
+        sys.stdout.flush()
 
     else:
         parser.print_help()

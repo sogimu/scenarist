@@ -55,6 +55,9 @@ def runScript(targets, pathToScript):
     for target in targets:
         if target in targetsCode:
             print bcolors.OKGREEN + "\nRun target " + target + " ..." + bcolors.ENDC
+            sys.stdout.flush()
+
             exec(targetsCode[target])
         else:
             print bcolors.WARNING + "Warning: Target " + target + " not found." + bcolors.ENDC
+            sys.stdout.flush()

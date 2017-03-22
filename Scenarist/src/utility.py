@@ -31,10 +31,12 @@ class cd:
         os.chdir(self.savedPath)
 
 def run(cmd):
-    print bcolors.BOLD + "> " + cmd + bcolors.ENDC
+    sys.stdout.write(bcolors.BOLD + "> " + cmd + bcolors.ENDC)
     retCode = subprocess.call(shlex.split(cmd))
     if retCode != 0:
-        raise Exception("Cmd: " + cmd + " fail with code " + retCode);
+        sys.stdout.write("Cmd: \"" + cmd + "\" fail with code " + str(retCode))
+        sys.stdout.flush()
+        sys.exit(retCode)
 
 def chooseScriptVariant(systemName, scriptsNames):
     sizeOfMatch = {}
