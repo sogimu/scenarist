@@ -22,11 +22,17 @@ set (CPACK_SOURCE_GENERATOR "ZIP")
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT ANDROID)
     set(CPACK_GENERATOR "DEB")
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Aleksandr Lizin <sogimu@nxt.ru>")
-    set(CPACK_DEBIAN_PACKAGE_DEPENDS "python2.7")
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "python2.7 (>= 2.7.6-8)")
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     set(CPACK_GENERATOR "NSIS")
+    set(CPACK_NSIS_CONTACT "Aleksandr Lizin <sogimu@nxt.ru>")
+    set(CPACK_NSIS_PACKAGE_NAME "Scenarist")
+    set(CPACK_NSIS_DISPLAY_NAME "Scenarist")
+    set(CPACK_NSIS_MODIFY_PATH ON)
+    set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+
 endif()
 
 include (CPack)
