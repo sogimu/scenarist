@@ -13,10 +13,9 @@ import shlex
 from os.path import exists
 from os import makedirs
 
-from Scenarist.src.utility import cd, run
-from Scenarist.src.info import Info
-
-from Scenarist.src.config import bcolors
+from build_scenarist.utility import cd, run
+from build_scenarist.info import Info
+from build_scenarist.config import bcolors
 
 def getTargets(pathToScript):
     with open(pathToScript) as f:

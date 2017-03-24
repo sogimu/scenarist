@@ -7,18 +7,14 @@ import re
 import subprocess
 import os.path
 import platform
+import build_scenarist
 
-from Scenarist.src.info import Info
-from Scenarist.src.utility import getScriptsVariants, chooseScriptVariant
-from Scenarist.src.runner import runScript
-from Scenarist.src.config import bcolors, scriptNameEnding
+version = "0.5.6"
 
-version = "0.5.2"
-
-info = Info()
+info = build_scenarist.Info()
 
 def script_name_parse(name):
-    if not(bool(re.match("^(.+" + scriptNameEnding + ")$", name))):
+    if not(bool(re.match("^(.+" + build_scenarist.scriptNameEnding + ")$", name))):
         msg = "%r bad script name " % name
         raise argparse.ArgumentTypeError(msg)
     return name
@@ -66,7 +62,7 @@ def createParser ():
             help = 'Specify targets in script to run. The script will be choosen by current platform name or with help argument -os')
 
     run_group.add_argument ('-script', type=script_name_parse, required=False,
-            help = "Specify script name for which os run. Example: Ubuntu_16.04. Format: " + "^(.+" + scriptNameEnding + ")$" + ". Default script name on this platform is " + info.fullPlatformName())
+            help = "Specify script name for which os run. Example: Ubuntu_16.04. Format: " + "^(.+" + build_scenarist.scriptNameEnding + ")$" + ". Default script name on this platform is " + info.fullPlatformName())
 
     run_group.add_argument ('-dir', type=path_to_dir, default="./scripts/", required=False,
             help = 'Path to directory with scripts. Example: ./scripts/')
@@ -90,7 +86,7 @@ if __name__ == '__main__':
         # print namespace.os
         # print namespace.targets
         # print namespace.dir
-        info = Info()
+        info = build_scenarist.Info()
         fullPlatformName = info.fullPlatformName()
 
         if namespace.dir == None:
@@ -99,27 +95,27 @@ if __name__ == '__main__':
             userScriptsDir = namespace.dir
 
         if namespace.script == None:
-            scriptsVariants = getScriptsVariants(userScriptsDir)
-            scriptVariant = chooseScriptVariant(fullPlatformName, scriptsVariants)
+            scriptsVariants = build_scenarist.getScriptsVariants(userScriptsDir)
+            scriptVariant = build_scenarist.chooseScriptVariant(fullPlatformName, scriptsVariants)
         else:
-            scriptVariant = namespace.script[:-1 * len(scriptNameEnding)]
+            scriptVariant = namespace.script[:-1 * len(build_scenarist.scriptNameEnding)]
 
         if userScriptsDir != None and scriptVariant != None:
-            pathToScript = os.path.join(userScriptsDir, scriptVariant + scriptNameEnding)
+            pathToScript = os.path.join(userScriptsDir, scriptVariant + build_scenarist.scriptNameEnding)
             if os.path.isfile(pathToScript):
-                print bcolors.HEADER + "Run targets of script: " + pathToScript + bcolors.ENDC
+                print build_scenarist.bcolors.HEADER + "Run targets of script: " + pathToScript + build_scenarist.bcolors.ENDC
                 print '\n'.join(namespace.targets)
                 sys.stdout.flush()
-                runScript(namespace.targets, pathToScript)
+                build_scenarist.runScript(namespace.targets, pathToScript)
             else:
-                print bcolors.FAIL + "Script " + pathToScript + " not found!" + bcolors.ENDC
+                print build_scenarist.bcolors.FAIL + "Script " + pathToScript + " not found!" + build_scenarist.bcolors.ENDC
                 sys.stdout.flush()
         else:
-            print bcolors.WARNING + "No script for current platform" + bcolors.ENDC
+            print build_scenarist.bcolors.WARNING + "No script for current platform" + build_scenarist.bcolors.ENDC
             sys.stdout.flush()
         
     elif namespace.command == "info":
-        info = Info()
+        info = build_scenarist.Info()
         print info.about_platform()
         sys.stdout.flush()
 

@@ -13,7 +13,7 @@ import shlex
 from os.path import exists, isfile, join
 from os import makedirs, listdir
 
-from Scenarist.src.config import scriptNameEnding, bcolors
+from build_scenarist.config import scriptNameEnding, bcolors
 
 class cd:
     """Context manager for changing the current working directory"""
@@ -31,12 +31,15 @@ class cd:
         os.chdir(self.savedPath)
 
 def run(cmd):
-    sys.stdout.write(bcolors.BOLD + "> " + cmd + bcolors.ENDC)
+    sys.stdout.write("\n" + bcolors.BOLD + "> " + cmd + bcolors.ENDC + "\n")
+    sys.stdout.flush()
     retCode = subprocess.call(shlex.split(cmd))
     if retCode != 0:
-        sys.stdout.write("Cmd: \"" + cmd + "\" fail with code " + str(retCode))
+        sys.stdout.write("\nCmd: \"" + cmd + "\" fail with code " + str(retCode))
         sys.stdout.flush()
         sys.exit(retCode)
+    sys.stdout.write("\n")
+    sys.stdout.flush()
 
 def chooseScriptVariant(systemName, scriptsNames):
     sizeOfMatch = {}

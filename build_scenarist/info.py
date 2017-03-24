@@ -2,8 +2,8 @@
  
 import os
 import platform
-import Scenarist.src.utility
-from Scenarist.src.config import scriptNameEnding
+import build_scenarist.utility
+from build_scenarist.config import scriptNameEnding
 
 class Info:
     def osName(self):
