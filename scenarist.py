@@ -9,7 +9,7 @@ import os.path
 import platform
 import build_scenarist
 
-version = "0.6.4"
+version = "0.6.5"
 
 info = build_scenarist.Info()
 

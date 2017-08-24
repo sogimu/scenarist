@@ -87,7 +87,7 @@ def executeTargetsInImage(targets, pathToScript, image):
 
     if isFaill == False:
         run("""
-            sudo docker run -v %s:/repo %s bash -xc '
+            sudo docker run -v %s:/repo %s bash -c '
                 hasPython2=$(dpkg --get-selections | grep -c -e "^python2.7\s.")
                 hasPythonSetuptools=$(dpkg --get-selections | grep -c -e "^python-setuptools\s.")
                 hasPipPackage=$(dpkg --get-selections | grep -c -e "^python-pip\s.")
