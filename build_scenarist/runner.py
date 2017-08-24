@@ -49,14 +49,81 @@ def getTargets(pathToScript):
     # print targets
     return targets
 
-def runScript(targets, pathToScript):
+def targetsNotInScript(targets, pathToScript):
     targetsCode = getTargets(pathToScript)
+    result = []
     for target in targets:
-        if target in targetsCode:
-            print bcolors.OKGREEN + "\nRun target " + target + " ..." + bcolors.ENDC
+        if not(target in targetsCode):
+            result.append(target)
+    return result
+
+def executeTargets(targets, pathToScript):
+    notFoundTargets = targetsNotInScript(targets, pathToScript)
+    isFaill = False
+    if len(notFoundTargets) != 0:
+        for target in notFoundTargets:
+            isFaill = True
+            print bcolors.FAIL + "\nError: Target %s not found in %s" % (target, pathToScript) + bcolors.ENDC
             sys.stdout.flush()
 
-            exec(targetsCode[target])
-        else:
-            print bcolors.WARNING + "Warning: Target " + target + " not found." + bcolors.ENDC
+    if isFaill == False:
+        targetsCode = getTargets(pathToScript)
+        for target in targets:
+            print bcolors.OKGREEN + "\nRun target " + target + " ..." + bcolors.ENDC
             sys.stdout.flush()
+            exec(targetsCode[target])
+    else:
+        print bcolors.FAIL + "\nError: Please, specify existed targets name!" + bcolors.ENDC
+        sys.stdout.flush()
+
+def executeTargetsInImage(targets, pathToScript, image):
+    notFoundTargets = targetsNotInScript(targets, pathToScript)
+    isFaill = False
+    if len(notFoundTargets) != 0:
+        for target in notFoundTargets:
+            isFaill = True
+            print bcolors.FAIL + "\nError: Target %s not found in %s" % (target, pathToScript) + bcolors.ENDC
+            sys.stdout.flush()
+
+    if isFaill == False:
+        run("""
+            sudo docker run -v %s:/repo %s bash -xc '
+                hasPython2=$(dpkg --get-selections | grep -c -e "^python2.7\s.")
+                hasPythonSetuptools=$(dpkg --get-selections | grep -c -e "^python-setuptools\s.")
+                hasPipPackage=$(dpkg --get-selections | grep -c -e "^python-pip\s.")
+                hasPip=$(which pip | grep -c pip)
+                hasScenarist=$(pip freeze | grep -c build-scenarist)
+
+                if [ "$hasPython2" == 0 ]; then
+                    echo "Packge Python2 installing ..."
+                    apt-get -y install python2.7
+                fi
+
+                if [ "$hasPythonSetuptools" == 0 ]; then
+                    echo "Packge python-setuptools installing ..."
+                    apt-get -y install python-setuptools
+                fi
+
+                if [ "$hasPip" == 0 ]; then
+                    if [ "$hasPipPackage" == 0 ]; then
+                        echo "Packge python-pip installing ..."
+                        apt-get -y install python-pip
+                    else
+                        echo "Utility pip installing ..."
+                        easy_install pip
+                    fi
+                fi
+
+                if [ "$hasScenarist" == 0 ]; then
+                    echo "Utility build_scenarist installing ..."    
+                    pip install build_scenarist
+                fi
+
+                cd /repo
+                scenarist.py info
+                scenarist.py run %s
+            '
+            """ % (os.getcwd(), image, " ".join(targets)))
+    else:
+        print bcolors.FAIL + "\nError: Please, specify existed targets name!" + bcolors.ENDC
+        sys.stdout.flush()

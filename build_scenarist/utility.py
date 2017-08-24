@@ -58,4 +58,4 @@ def getScriptsVariants(scriptsDir):
         match = re.match("^(.*" + scriptNameEnding + ")$", fileName)
         if bool(match):
             scriptsNames.append(fileName[:-1 * len(scriptNameEnding)])
-    return scriptsNames
+    return scriptsNames    

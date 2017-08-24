@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='build_scenarist',
-      version='0.5.7',
+      version='0.6.3',
       description='',
       url='http://github.com/sogimu/scenarist',
       author='Aleksandr Lizin',

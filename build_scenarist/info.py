@@ -7,14 +7,14 @@ from build_scenarist.config import scriptNameEnding
 
 class Info:
     def osName(self):
-        return platform.system()
+        return platform.system().replace('"', '')
     
     def distName(self):
         distName = "None_None"
         if self.osName() == "Linux":
-            distName = platform.dist()[0]+'_'+platform.dist()[1]
+            distName = platform.dist()[0].replace('"', '')+'_'+platform.dist()[1].replace('"', '')
         elif self.osName() == "Windows":
-            distName = platform.win32_ver()[0]+'_'+platform.win32_ver()[1]
+            distName = platform.win32_ver()[0].replace('"', '')+'_'+platform.win32_ver()[1].replace('"', '')
         return distName
 
     def fullPlatformName(self):
