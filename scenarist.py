@@ -9,7 +9,7 @@ import os.path
 import platform
 import build_scenarist
 
-version = "0.6.10"
+version = "0.7.0"
 
 info = build_scenarist.Info()
 
@@ -103,7 +103,16 @@ if __name__ == '__main__':
         info = build_scenarist.Info()
         fullPlatformName = info.fullPlatformName()
 
-        print(namespace)
+        # print(namespace)
+
+        if namespace.targets == None:
+            targets = ""
+        else:
+            targets = []
+            for targetCall in namespace.targets:
+                targetInfo = build_scenarist.splitTargetCallToNameAndParams(targetCall)
+                targets.append(targetInfo)
+        # print(targets)
 
         # scriptDir
         if namespace.scriptDir == None:
@@ -130,7 +139,7 @@ if __name__ == '__main__':
                     print build_scenarist.bcolors.HEADER + "Run targets of script: " + pathToScript + build_scenarist.bcolors.ENDC
                     print '\n'.join(namespace.targets)
                     sys.stdout.flush()
-                    build_scenarist.executeTargets(namespace.targets, pathToScript)
+                    build_scenarist.executeTargets(targets, pathToScript)
             else:
                 print build_scenarist.bcolors.FAIL + "Script " + pathToScript + " not found!" + build_scenarist.bcolors.ENDC
                 sys.stdout.flush()

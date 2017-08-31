@@ -13,25 +13,18 @@ import shlex
 from os.path import exists
 from os import makedirs
 
-from build_scenarist.utility import cd, run
+from build_scenarist.utility import cd, run, runPythonCode
 from build_scenarist.info import Info
 from build_scenarist.config import bcolors
 
 def getTargets(pathToScript):
     with open(pathToScript) as f:
         content = f.readlines()
-    # you may also want to remove whitespace characters like `\n` at the end of each line
-    # content = [x.strip() for x in content]
-    # for i in content:
-        # print i
 
     targetPositions = []
-    for i, val in enumerate(content):
-        # print i, val
-        if bool(re.match("^(\[+.*\]+)$", val)):
-            targetPositions.append(i)
-    targetPositions
-    # print targetPositions
+    for lineIndex, text in enumerate(content):
+        if bool(re.match("^(\[+.*\]+)$", text)):
+            targetPositions.append(lineIndex)
 
     targets = {}
     fro=0
@@ -52,13 +45,13 @@ def getTargets(pathToScript):
 def targetsNotInScript(targets, pathToScript):
     targetsCode = getTargets(pathToScript)
     result = []
-    for target in targets:
+    for target, params in targets:
         if not(target in targetsCode):
             result.append(target)
     return result
 
-def executeTargets(targets, pathToScript):
-    notFoundTargets = targetsNotInScript(targets, pathToScript)
+def executeTargets(p_targets, pathToScript):
+    notFoundTargets = targetsNotInScript(p_targets, pathToScript)
     isFaill = False
     if len(notFoundTargets) != 0:
         for target in notFoundTargets:
@@ -68,10 +61,22 @@ def executeTargets(targets, pathToScript):
 
     if isFaill == False:
         targetsCode = getTargets(pathToScript)
-        for target in targets:
+        for target, params in p_targets:
             print bcolors.OKGREEN + "\nRun target " + target + " ..." + bcolors.ENDC
             sys.stdout.flush()
-            exec(targetsCode[target])
+            code = ""
+            # print(params)
+            for paramCode in params:
+                code += "%s\n" % (paramCode) 
+                # print(paramCode)
+            # code += "container='sogimu/astralinux:1.11'\n"
+            code += targetsCode[target]
+
+            runPythonCode(code)
+            # sys.stdout.write("\n" + bcolors.HEADER + "python >" + bcolors.ENDC + "\n")
+            # sys.stdout.write(bcolors.BOLD + code + bcolors.ENDC + "\n")
+            # sys.stdout.flush()
+            # exec(code)
     else:
         print bcolors.FAIL + "\nError: Please, specify existed targets name!" + bcolors.ENDC
         sys.stdout.flush()
