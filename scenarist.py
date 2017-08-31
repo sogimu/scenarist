@@ -9,7 +9,7 @@ import os.path
 import platform
 import build_scenarist
 
-version = "0.6.8"
+version = "0.6.10"
 
 info = build_scenarist.Info()
 
@@ -37,7 +37,7 @@ def createParser ():
     # Создаем класс парсера
     parser = argparse.ArgumentParser(
             prog = 'scenarist',
-            description = '''Utility for running platform specific scripts''',
+            description = '''Utility for running platform specific scenario''',
             epilog = '''Lizin Aleksandr aka sogimu, email: sogimu@nxt.ru, 2017''',
             add_help = True
             )
@@ -72,8 +72,8 @@ def createParser ():
     run_group.add_argument ('--script', '-s', type=script_name_parse, required=False,
             help = "Specify script name for which os run. Example: Ubuntu_16.04. Format: " + "^(.+" + build_scenarist.scriptNameEnding + ")$" + ". Default script name on this platform is " + info.fullPlatformName())
 
-    run_group.add_argument ('--scriptDir', '-d', type=real_path_to_dir, default="./scripts/", required=False,
-            help = 'Path to directory with scripts. Example: ./scripts/')
+    run_group.add_argument ('--scriptDir', '-d', type=real_path_to_dir, default=build_scenarist.scriptsDir, required=False,
+            help = 'Path to directory with scenario. Example: ./scenario/')
 
     run_group.add_argument ('--image', '-i', type=image_name_parse, required=False,
             help = "Specify docker image name for run. Example: ubuntu_16.04.")
@@ -107,14 +107,14 @@ if __name__ == '__main__':
 
         # scriptDir
         if namespace.scriptDir == None:
-            userScriptsDir = scriptsDir
+            userScriptsDir = scenarioDir
         else:
             userScriptsDir = namespace.scriptDir
 
         # script
         if namespace.script == None:
-            scriptsVariants = build_scenarist.getScriptsVariants(userScriptsDir)
-            scriptVariant = build_scenarist.chooseScriptVariant(fullPlatformName, scriptsVariants)
+            scenarioVariants = build_scenarist.getScriptsVariants(userScriptsDir)
+            scriptVariant = build_scenarist.chooseScriptVariant(fullPlatformName, scenarioVariants)
         else:
             scriptVariant = namespace.script[:-1 * len(build_scenarist.scriptNameEnding)]
 
