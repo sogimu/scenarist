@@ -1,7 +1,9 @@
 from setuptools import setup
 
+from scenarist import version
+
 setup(name='build_scenarist',
-      version='0.6.5',
+      version=version,
       description='',
       url='http://github.com/sogimu/scenarist',
       author='Aleksandr Lizin',

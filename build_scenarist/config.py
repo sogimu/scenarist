@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
-scriptNameEnding = ".script"
-scriptsDir = "./scripts/"
+scriptNameEnding = ".scenario"
+scriptsDir = "./scenario"
 
 class bcolors:
     HEADER = '\033[95m'

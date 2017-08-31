@@ -87,26 +87,29 @@ def executeTargetsInImage(targets, pathToScript, image):
 
     if isFaill == False:
         run("""
-            sudo docker run -v %s:/repo %s bash -c '
+            sudo docker run -v %s:/repo %s bash -cex '
                 hasPython2=$(dpkg --get-selections | grep -c -e "^python2.7\s.")
                 hasPythonSetuptools=$(dpkg --get-selections | grep -c -e "^python-setuptools\s.")
                 hasPipPackage=$(dpkg --get-selections | grep -c -e "^python-pip\s.")
                 hasPip=$(which pip | grep -c pip)
-                hasScenarist=$(pip freeze | grep -c build-scenarist)
+
+                if [ "$hasPython2" == 0 ] || [ "$hasPythonSetuptools" == 0 ] || [ "$hasPip" == 0 ]; then
+                    apt-get update
+                fi
 
                 if [ "$hasPython2" == 0 ]; then
-                    echo "Packge Python2 installing ..."
+                    echo "Package Python2 installing ..."
                     apt-get -y install python2.7
                 fi
 
                 if [ "$hasPythonSetuptools" == 0 ]; then
-                    echo "Packge python-setuptools installing ..."
+                    echo "Package python-setuptools installing ..."
                     apt-get -y install python-setuptools
                 fi
 
                 if [ "$hasPip" == 0 ]; then
                     if [ "$hasPipPackage" == 0 ]; then
-                        echo "Packge python-pip installing ..."
+                        echo "Package python-pip installing ..."
                         apt-get -y install python-pip
                     else
                         echo "Utility pip installing ..."
@@ -114,8 +117,9 @@ def executeTargetsInImage(targets, pathToScript, image):
                     fi
                 fi
 
+                hasScenarist=$(pip freeze | grep -c build-scenarist)
                 if [ "$hasScenarist" == 0 ]; then
-                    echo "Utility build_scenarist installing ..."    
+                    echo "Utilit byuild_scenarist installing ..."    
                     pip install build_scenarist
                 fi
 
