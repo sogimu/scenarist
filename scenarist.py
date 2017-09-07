@@ -9,7 +9,7 @@ import os.path
 import platform
 import build_scenarist
 
-version = "0.7.1"
+version = "0.7.2"
 
 info = build_scenarist.Info()
 
@@ -75,9 +75,6 @@ def createParser ():
     run_group.add_argument ('--scriptDir', '-d', type=real_path_to_dir, default=build_scenarist.scriptsDir, required=False,
             help = 'Path to directory with scenario. Example: ./scenario/')
 
-    run_group.add_argument ('--image', '-i', type=image_name_parse, required=False,
-            help = "Specify docker image name for run. Example: ubuntu_16.04.")
-
     run_group.add_argument ('--workspace', '-w', type=path_to_dir, required=False,
             help = "Specify path to dir where script should be run. Example: /repo")
 
@@ -130,12 +127,7 @@ if __name__ == '__main__':
         if userScriptsDir != None and scriptVariant != None and namespace.targets != None:
             pathToScript = os.path.join(userScriptsDir, scriptVariant + build_scenarist.scriptNameEnding)
             if os.path.isfile(pathToScript):
-                if namespace.image != None and namespace.targets != None:
-                    print build_scenarist.bcolors.HEADER + "Run targets of script: %s in docker image: %s " % (pathToScript, namespace.image) + build_scenarist.bcolors.ENDC
-                    print '\n'.join(namespace.targets)
-                    sys.stdout.flush()
-                    build_scenarist.executeTargetsInImage(namespace.targets, pathToScript, namespace.image)
-                else:
+                if namespace.targets != None:
                     print build_scenarist.bcolors.HEADER + "Run target's " + build_scenarist.bcolors.ENDC + build_scenarist.bcolors.BOLD + ' '.join(namespace.targets) + build_scenarist.bcolors.ENDC + build_scenarist.bcolors.HEADER + " of script: " + os.path.abspath(pathToScript) + build_scenarist.bcolors.ENDC
                     sys.stdout.flush()
                     build_scenarist.executeTargets(targets, pathToScript)
