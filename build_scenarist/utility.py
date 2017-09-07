@@ -31,9 +31,9 @@ class cd:
 		os.chdir(self.savedPath)
 
 def run(cmd):
-	sys.stdout.write("\n" + bcolors.HEADER + "shell: " + bcolors.ENDC + "\n")
-	sys.stdout.write(bcolors.BOLD + cmd + bcolors.ENDC + "\n")
-	sys.stdout.flush()
+	#sys.stdout.write("\n" + bcolors.HEADER + "shell: " + bcolors.ENDC + "\n")
+	#sys.stdout.write(bcolors.BOLD + cmd + bcolors.ENDC + "\n")
+	#sys.stdout.flush()
 	retCode = subprocess.call(shlex.split(cmd))
 	if retCode != 0:
 		sys.stdout.write("\nShell code failed with code: " + str(retCode) + "\n")
@@ -43,9 +43,9 @@ def run(cmd):
 	sys.stdout.flush()
 
 def runPythonCode(code):
-	sys.stdout.write("\n" + bcolors.HEADER + "python >" + bcolors.ENDC + "\n")
-	sys.stdout.write(bcolors.BOLD + code + bcolors.ENDC + "\n")
-	sys.stdout.flush()
+	#sys.stdout.write("\n" + bcolors.HEADER + "python >" + bcolors.ENDC + "\n")
+	#sys.stdout.write(bcolors.BOLD + code + bcolors.ENDC + "\n")
+	#sys.stdout.flush()
 	exec(code)
 
 def chooseScriptVariant(systemName, scriptsNames):

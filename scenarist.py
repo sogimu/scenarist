@@ -9,7 +9,7 @@ import os.path
 import platform
 import build_scenarist
 
-version = "0.7.0"
+version = "0.7.1"
 
 info = build_scenarist.Info()
 
@@ -136,8 +136,7 @@ if __name__ == '__main__':
                     sys.stdout.flush()
                     build_scenarist.executeTargetsInImage(namespace.targets, pathToScript, namespace.image)
                 else:
-                    print build_scenarist.bcolors.HEADER + "Run targets of script: " + pathToScript + build_scenarist.bcolors.ENDC
-                    print '\n'.join(namespace.targets)
+                    print build_scenarist.bcolors.HEADER + "Run target's " + build_scenarist.bcolors.ENDC + build_scenarist.bcolors.BOLD + ' '.join(namespace.targets) + build_scenarist.bcolors.ENDC + build_scenarist.bcolors.HEADER + " of script: " + os.path.abspath(pathToScript) + build_scenarist.bcolors.ENDC
                     sys.stdout.flush()
                     build_scenarist.executeTargets(targets, pathToScript)
             else:

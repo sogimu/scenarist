@@ -62,7 +62,7 @@ def executeTargets(p_targets, pathToScript):
     if isFaill == False:
         targetsCode = getTargets(pathToScript)
         for target, params in p_targets:
-            print bcolors.OKGREEN + "\nRun target " + target + " ..." + bcolors.ENDC
+            print bcolors.OKGREEN + "Target " + target + "..." + bcolors.ENDC
             sys.stdout.flush()
             code = ""
             # print(params)
