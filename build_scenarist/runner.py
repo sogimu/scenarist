@@ -13,9 +13,9 @@ import shlex
 from os.path import exists
 from os import makedirs
 
-from build_scenarist.utility import cd, run, runPythonCode
+from build_scenarist.utility import cd, runShell, runPythonCode, splitTargetCallToNameAndParams
 from build_scenarist.info import Info
-from build_scenarist.config import bcolors
+from build_scenarist.config import bcolors, global_vars
 
 def getTargets(pathToScript):
     with open(pathToScript) as f:
@@ -52,6 +52,7 @@ def targetsNotInScript(targets, pathToScript):
 
 def executeTargets(p_targets, pathToScript):
     notFoundTargets = targetsNotInScript(p_targets, pathToScript)
+
     isFaill = False
     if len(notFoundTargets) != 0:
         for target in notFoundTargets:
@@ -64,7 +65,7 @@ def executeTargets(p_targets, pathToScript):
         for target, params in p_targets:
             print bcolors.OKGREEN + "Target " + target + "..." + bcolors.ENDC
             sys.stdout.flush()
-            code = ""
+            code = "from build_scenarist.runner import runTarget\n"
             # print(params)
             for paramCode in params:
                 code += "%s\n" % (paramCode) 
@@ -80,3 +81,7 @@ def executeTargets(p_targets, pathToScript):
     else:
         print bcolors.FAIL + "\nError: Please, specify existed targets name!" + bcolors.ENDC
         sys.stdout.flush()
+
+def runTarget(targetCall):
+    nameAndParams = splitTargetCallToNameAndParams(targetCall)
+    executeTargets([nameAndParams], global_vars["pathToScript"])

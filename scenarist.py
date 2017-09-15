@@ -9,7 +9,7 @@ import os.path
 import platform
 import build_scenarist
 
-version = "0.7.2"
+version = "0.8.0"
 
 info = build_scenarist.Info()
 
@@ -98,7 +98,10 @@ if __name__ == '__main__':
         # print namespace.targets
         # print namespace.dir
         info = build_scenarist.Info()
+        build_scenarist.global_vars["info"] = info
+
         fullPlatformName = info.fullPlatformName()
+        build_scenarist.global_vars["fullPlatformName"] = fullPlatformName
 
         # print(namespace)
 
@@ -109,13 +112,16 @@ if __name__ == '__main__':
             for targetCall in namespace.targets:
                 targetInfo = build_scenarist.splitTargetCallToNameAndParams(targetCall)
                 targets.append(targetInfo)
-        # print(targets)
+
+        build_scenarist.global_vars["targets"] = targets
 
         # scriptDir
         if namespace.scriptDir == None:
             userScriptsDir = scenarioDir
         else:
             userScriptsDir = namespace.scriptDir
+
+        build_scenarist.global_vars["userScriptsDir"] = userScriptsDir
 
         # script
         if namespace.script == None:
@@ -124,8 +130,12 @@ if __name__ == '__main__':
         else:
             scriptVariant = namespace.script[:-1 * len(build_scenarist.scriptNameEnding)]
 
+        build_scenarist.global_vars["scriptVariant"] = scriptVariant
+
+        pathToScript = os.path.join(userScriptsDir, scriptVariant + build_scenarist.scriptNameEnding)
+        build_scenarist.global_vars["pathToScript"] = pathToScript
+
         if userScriptsDir != None and scriptVariant != None and namespace.targets != None:
-            pathToScript = os.path.join(userScriptsDir, scriptVariant + build_scenarist.scriptNameEnding)
             if os.path.isfile(pathToScript):
                 if namespace.targets != None:
                     print build_scenarist.bcolors.HEADER + "Run target's " + build_scenarist.bcolors.ENDC + build_scenarist.bcolors.BOLD + ' '.join(namespace.targets) + build_scenarist.bcolors.ENDC + build_scenarist.bcolors.HEADER + " of script: " + os.path.abspath(pathToScript) + build_scenarist.bcolors.ENDC
