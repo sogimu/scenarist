@@ -75,5 +75,5 @@ def splitTargetCallToNameAndParams(targetCall):
 	paramsString = re.findall("^[a-zA-Z][a-zA-Z0-9\_]*:(.+)$", targetCall)
 	params = ""
 	if len(paramsString) == 1:
-		params = re.findall(r"([a-zA-Z][a-zA-Z0-9\_]*=(\[.*\])*([0-9]+)*(\"[a-zA-Z0-9\,\.\:\/]*\")*)", paramsString[0])
+		params = re.findall(r"([a-zA-Z][a-zA-Z0-9\_]*=(\[.*\])*([0-9]+)*(\"[a-zA-Z0-9\,\.\:\/\_\-]*\")*)", paramsString[0])
 	return (name, [param[0] for param in params])
