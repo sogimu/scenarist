@@ -30,17 +30,18 @@ class cd:
 	def __exit__(self, etype, value, traceback):
 		os.chdir(self.savedPath)
 
-def runShell(cmd):
+def runShell(cmd, fallAtFail=True):
 	sys.stdout.write("\n" + bcolors.HEADER + "shell: " + bcolors.ENDC + "\n")
 	sys.stdout.write(bcolors.BOLD + cmd + bcolors.ENDC + "\n")
 	sys.stdout.flush()
 	retCode = subprocess.call(shlex.split(cmd))
-	if retCode != 0:
+	if retCode != 0 and fallAtFail:
 		sys.stdout.write("\nShell code failed with code: " + str(retCode) + "\n")
 		sys.stdout.flush()
 		sys.exit(retCode)
 	sys.stdout.write("\n")
 	sys.stdout.flush()
+	return retCode
 
 def runPythonCode(code):
 	#sys.stdout.write("\n" + bcolors.HEADER + "python >" + bcolors.ENDC + "\n")
