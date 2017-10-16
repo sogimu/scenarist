@@ -1,5 +1,8 @@
-# Scenarist
-Utility for running platform depended scripts. Lang of scripts is Python 2.7. Scripts have targets. 
+# scenarist.py
+
+Make-подобная утилита для выполнения платформозависимых сценариев на Python 2.7. Сценарии состоят из целей
+
+Страница pip-пакета: https://pypi.python.org/pypi/build_scenarist
 
 ### Script have targets like [target_name]. Every target can be run with syntax like
 ```bash
