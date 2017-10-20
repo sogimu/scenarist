@@ -1,5 +1,6 @@
 # scenarist.py
 [![Build Status](http://sogimu.fvds.ru:8080/job/scenarist.py/job/build/badge/icon)](http://sogimu.fvds.ru:8080/job/scenarist.py/job/build/)
+
 Make-подобная утилита для выполнения платформозависимых сценариев на Python 2.7. Сценарии состоят из целей
 
 Страница pip-пакета: https://pypi.python.org/pypi/build_scenarist
