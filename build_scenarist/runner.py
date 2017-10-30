@@ -13,7 +13,7 @@ import shlex
 from os.path import exists
 from os import makedirs
 
-from build_scenarist.utility import cd, runShell, runPythonCode, splitTargetCallToNameAndParams
+from build_scenarist.utility import cd, runShell, runPythonCode, splitTargetCallToNameAndParams, removeShiftings
 from build_scenarist.info import Info
 from build_scenarist.config import bcolors, global_vars
 
@@ -39,7 +39,6 @@ def getTargets(pathToScript):
         targetName = content[targetPositions[i]][1:-2]
         targetCode = '\n'.join(content[fro:to])
         targets[targetName] = targetCode
-    # print targets
     return targets
 
 def targetsNotInScript(targets, pathToScript):
@@ -66,18 +65,12 @@ def executeTargets(p_targets, pathToScript):
             print bcolors.OKGREEN + "Target " + target + "..." + bcolors.ENDC
             sys.stdout.flush()
             code = "from build_scenarist.runner import runTarget\n"
-            # print(params)
             for paramCode in params:
-                code += "%s\n" % (paramCode) 
-                # print(paramCode)
-            # code += "container='sogimu/astralinux:1.11'\n"
-            code += targetsCode[target]
+                code += "%s\n" % (paramCode)
+
+            code += removeShiftings(targetsCode[target])
 
             runPythonCode(code)
-            # sys.stdout.write("\n" + bcolors.HEADER + "python >" + bcolors.ENDC + "\n")
-            # sys.stdout.write(bcolors.BOLD + code + bcolors.ENDC + "\n")
-            # sys.stdout.flush()
-            # exec(code)
     else:
         print bcolors.FAIL + "\nError: Please, specify existed targets name!" + bcolors.ENDC
         sys.stdout.flush()
