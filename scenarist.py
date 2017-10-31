@@ -9,7 +9,7 @@ import os.path
 import platform
 import build_scenarist
 
-version = "0.9.0"
+# version = "0.9.0"
 
 info = build_scenarist.Info()
 
@@ -49,7 +49,7 @@ def createParser ():
     parent_group.add_argument ('--version', '-v',
                 action='version',
                 help = 'Print version',
-                version='%(prog)s {}'.format (version))
+                version='%(prog)s {}'.format (build_scenarist.__version__))
 
     # Создаем группу подпарсеров
     subparsers = parser.add_subparsers (dest = 'command',

@@ -1,61 +1,74 @@
 [default]
-runTarget("in_container:container=\"sogimu/astralinux:1.11\", targets=[\"install_deps\", \"make_package_in_docker_image\"]")
-runTarget("share_build:host=\"10.11.2.132\",folder=\"astralinux-1.11/scenarist.py\"")
+    runTarget("in_container:container=\"sogimu/astralinux:1.11\", targets=[\"install_deps\", \"build\"]")
+    runTarget("deploy_package:host=\"10.11.2.132\",folder=\"astralinux-1.11/scenarist.py\"")
 
 [install_deps]
-runShell("apt-get update")
-runShell("apt-get install -y python-dev")
-runShell("pip install virtualenv")
+    runShell("apt-get update")
+    runShell("apt-get install -y python-dev")
+
+[extract_version]
+    version = subprocess.check_output(["git", "describe", "--abbrev=4", "--tags", "--always", "--dirty"])
+    version = version.replace('\n', '')
+    initFile = "build_scenarist/__init__.py"
+    f = open(initFile, "r")
+    fileText = f.read()
+    f.close()
+
+    f = open(initFile, "w")
+    fileText = re.sub("__version__ = .+\n", "__version__ = \"%s\"\n" % version, fileText)
+    f.seek(0)
+    f.write(fileText)
+    f.close()
 
 [make_package]
-runShell("virtualenv env")
-runShell("bash ./env/bin/activate")
-runShell("./env/bin/python2 setup.py sdist")
-runShell("./env/bin/python2 setup.py install")
+    runShell("rm -rf dist")
+    runShell("python2 setup.py sdist")
+    with cd("dist"):
+        runShell("bash -c 'ls | xargs -I {} ln -s {} build_scenarist_latest.tar.gz'")
 
-[make_package_in_docker_image]
-runShell("python2 setup.py sdist")
-runShell("python2 setup.py install")
+[build]
+    runTarget("extract_version")
+    runTarget("make_package")
 
-[share_build]
-try: host
-except:
-    raise Exception("Необходимо ввести имя хоста!")    
+[deploy_package]
+    try: host
+    except:
+        raise Exception("Необходимо ввести имя хоста!")    
 
-try: folder
-except:
-    raise Exception("Необходимо ввести путь к папке!")    
+    try: folder
+    except:
+        raise Exception("Необходимо ввести путь к папке!")    
 
-runShell("""
-bash -ec
-'
-    currentTag=$(git tag -l --points-at HEAD)
-    if [ -z ${currentTag} ]; then
-       echo "Нет git-тега. Я не буду выкладывать пакет в открытый доступ!";
-    else
-        echo "Git-тэг: "${currentTag}
-        PUBLIC_ROOT=/var/lib/jenkins/public/
-        PUBLIC_DIR_PATH=${PUBLIC_ROOT}%s
-        echo "Путь к публичной папке: "${PUBLIC_DIR_PATH}
-        ssh jenkins@%s mkdir -p ${PUBLIC_DIR_PATH}
-        rsync dist/*.tar.gz jenkins@%s:${PUBLIC_DIR_PATH}
-    fi
-'
-""" % (folder, host, host))
+    runShell("""
+    bash -ec
+    '
+        currentTag=$(git tag -l --points-at HEAD)
+        if [ -z ${currentTag} ]; then
+           echo "Нет git-тега. Я не буду выкладывать пакет в открытый доступ!";
+        else
+            echo "Git-тэг: "${currentTag}
+            PUBLIC_ROOT=/var/lib/jenkins/public/
+            PUBLIC_DIR_PATH=${PUBLIC_ROOT}%s
+            echo "Путь к публичной папке: "${PUBLIC_DIR_PATH}
+            ssh jenkins@%s mkdir -p ${PUBLIC_DIR_PATH}
+            rsync dist/*.tar.gz jenkins@%s:${PUBLIC_DIR_PATH}
+        fi
+    '
+    """ % (folder, host, host))
 
 [in_container]
-try: container
-except:
-    raise Exception("Необходимо ввести имя docker-контейнера!")
+    try: container
+    except:
+        raise Exception("Необходимо ввести имя docker-контейнера!")
 
-try: targets
-except:
-    raise Exception("Необходимо ввести список целей!")
+    try: targets
+    except:
+        raise Exception("Необходимо ввести список целей!")
 
-runShell("""
-    sudo docker run -v %s:/repo %s bash -cex '
-        cd /repo
-        scenarist.py info
-        scenarist.py run %s
-    '
-    """ % (os.getcwd(), container, "  ".join(targets)))
+    runShell("""
+        sudo docker run -v %s:/repo %s bash -cex '
+            cd /repo
+            scenarist.py info
+            scenarist.py run %s
+        '
+        """ % (os.getcwd(), container, "  ".join(targets)))
