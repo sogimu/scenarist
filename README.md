@@ -1,5 +1,6 @@
 # scenarist.py
-[![Build Status](http://sogimu.fvds.ru:8080/job/scenarist.py/job/build/badge/icon)](http://sogimu.fvds.ru:8080/job/scenarist.py/job/build/)
+
+[![Build Status](http://sogimu.fvds.ru:8080/buildStatus/icon?job=scenarist.py/Astralinux_1.11)](http://sogimu.fvds.ru:8080/job/scenarist.py/job/Astralinux_1.11/) Astralinux 1.11, master
 
 Make-подобная утилита для выполнения платформозависимых сценариев на Python 2.7. Сценарии состоят из целей
 
