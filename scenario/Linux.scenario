@@ -1,6 +1,20 @@
 [default]
-    runTarget("in_container:container=\"sogimu/astralinux:1.11\", targets=[\"install_deps\", \"build\"]")
-    runTarget("deploy_package:host=\"10.11.2.132\",folder=\"astralinux-1.11/scenarist.py\"")
+    try:
+        if len(imageName) == 0: raise
+    except: imageName="sogimu/astralinux"
+
+    try:
+        if len(imageTag) == 0: raise
+    except: imageTag="1.11"
+
+    try: deploy
+    except:
+        deploy=False
+
+    runTarget("in_container:container=\"%s:%s\", targets=[\"install_deps\", \"build\"]" % (imageName, imageTag))
+
+    if deploy != False:
+        runTarget("deploy_package:host=\"sogimu.fvds.ru\",folder=\"build_scenarst/\"")
 
 [install_deps]
     runShell("apt-get update")
@@ -67,6 +81,7 @@
 
     runShell("""
         sudo docker run -v %s:/repo %s bash -cex '
+            pip install -U build_scenarist
             cd /repo
             scenarist.py info
             scenarist.py run %s
