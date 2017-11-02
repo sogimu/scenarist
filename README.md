@@ -6,6 +6,9 @@ Make-подобная утилита для выполнения платфор�
 
 Страница pip-пакета: https://pypi.python.org/pypi/build_scenarist
 
+## Похожие утилиты
+* [dapp](https://github.com/flant/dapp)
+
 ### Script have targets like [target_name]. Every target can be run with syntax like
 ```bash
 scenarist run target_name
