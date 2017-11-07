@@ -5,6 +5,10 @@
 Make-подобная утилита для выполнения платформозависимых сценариев на Python 2.7. Сценарии состоят из целей
 
 Страница pip-пакета: https://pypi.python.org/pypi/build_scenarist
+## Установки или обновления
+```
+# pip install -U build_scenarist
+```
 
 ## Похожие утилиты
 * [dapp](https://github.com/flant/dapp)
