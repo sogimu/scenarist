@@ -1,12 +1,49 @@
-[a]
+[test_helperA]
     print(param)
-    a = "b::param=%s" % str(param)
+    a = "test_helperB::param=%s" % str(param)
     # b = "b::param=[\"a\"]"
     print(a)
     runTarget(a)
     # runShell('./scenarist.py run b::param=%s' % str(param))
-[b]
+[test_helperB]
     print(param)
+
+[test]
+    # проверка на числа
+    runTarget("test_helperB:param=1")
+    runTarget("test_helperB::param=12")
+    runTarget("test_helperB::param=1.1")
+    runTarget("test_helperB::param=12.1")
+    runTarget("test_helperB::param=12.12")
+
+    # проверка на строки
+    runTarget("test_helperB::param=abc")
+    # runTarget("test_helperB::param=\"abc\"")
+    # runTarget('test_helperB::param=\'abc\'')
+    # runTarget("test_helperB::param=\'abc\'")
+    # runTarget("test_helperB::param='abc'")
+
+    # проверка на массивы
+    runTarget("test_helperB::param=[1]")
+    runTarget("test_helperB::param=[12]")
+    runTarget("test_helperB::param=[1.1]")
+    runTarget("test_helperB::param=[12.12]")
+    runTarget("test_helperB::param=[1,2]")
+    runTarget("test_helperB::param=[1.1,2.1]")
+    runTarget("test_helperB::param=[12,22]")
+    runTarget("test_helperB::param=[12.1,22.1]")
+    runTarget("test_helperB::param=[a]")
+    runTarget("test_helperB::param=[\"a\"]")
+    runTarget("test_helperB::param=[a,b]")
+    runTarget("test_helperB::param=[a,b,1]")
+    runTarget("test_helperB::param=[\"a\",\"b\"]")
+    runTarget("test_helperB::param=[ab]")
+    runTarget("test_helperB::param=[\"ab\"]")
+    runTarget("test_helperB::param=[ab,ab]")
+    runTarget("test_helperB::param=[\"ab\",\"ab\"]")
+    runTarget("test_helperB::param=[\"ab\",\"ab\", 1]")
+    runTarget("test_helperB::param=[\"ab\",\"ab\", 12]")
+    runTarget("test_helperB::param=[\"ab\",\"ab\", 12.12]")
 
 [default]
     try:
