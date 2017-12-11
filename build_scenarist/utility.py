@@ -44,9 +44,9 @@ def runShell(cmd, fallAtFail=True):
     return retCode
 
 def runPythonCode(code):
-    #sys.stdout.write("\n" + bcolors.HEADER + "python >" + bcolors.ENDC + "\n")
-    #sys.stdout.write(bcolors.BOLD + code + bcolors.ENDC + "\n")
-    #sys.stdout.flush()
+    # sys.stdout.write("\n" + bcolors.HEADER + "python >" + bcolors.ENDC + "\n")
+    # sys.stdout.write(bcolors.BOLD + code + bcolors.ENDC + "\n")
+    # sys.stdout.flush()
     exec(code)
 
 def chooseScriptVariant(systemName, scriptsNames):
@@ -66,18 +66,52 @@ def getScriptsVariants(scriptsDir):
         match = re.match("^(.*" + scriptNameEnding + ")$", fileName)
         if bool(match):
             scriptsNames.append(fileName[:-1 * len(scriptNameEnding)])
-    return scriptsNames    
+    return scriptsNames
 
 def splitTargetCallToNameAndParams(targetCall):
-    nameString = re.findall("^([a-zA-Z][a-zA-Z0-9\_]*):*.*$", targetCall)
-    name = ""
-    if len(nameString) == 1:
-        name = nameString[0]
-    paramsString = re.findall("^[a-zA-Z][a-zA-Z0-9\_]*:(.+)$", targetCall)
-    params = ""
-    if len(paramsString) == 1:
-        params = re.findall(r"([a-zA-Z][a-zA-Z0-9\_]*=(\[.*\])*([0-9]+)*(\"[a-zA-Z0-9\,\.\:\/\_\-]*\")*)", paramsString[0])
-    return (name, [param[0] for param in params])
+    targetNamePart = re.findall("^([a-zA-Z][a-zA-Z0-9\_]*):*.*$", targetCall)
+    targetName = ""
+    if len(targetNamePart) == 1:
+        targetName = targetNamePart[0]
+
+    assignmentsPart = re.findall("^[a-zA-Z][a-zA-Z0-9\_]*:*(.+)$", targetCall)
+
+    # print(assignmentsPart)
+
+    if len(assignmentsPart) == 1:
+        stringAssignments  = []
+        numberAssignments = []
+        arraysAssignments  = []
+
+        numberAssignments = re.findall(r"([a-zA-Z][^,^=]*\=[\-\+]?[0-9\.]+)", assignmentsPart[0])
+        stringAssignments  = re.findall(r"((?![a-zA-Z][^,^=]*\=[\d\+\-]+)[a-zA-Z][^\,^\=]*\=[^\,^\[^\]]+)", assignmentsPart[0])
+        arraysAssignments  = re.findall(r"([a-zA-Z][^,^=]*\=\[[0-9a-zA-Z\"\'\.\,\ \[\]\_\/]+\])", assignmentsPart[0])
+
+    # print("stringAssignments ", stringAssignments)
+    # print("numberAssignments ", numberAssignments)
+    # print("arraysAssignments ", arraysAssignments)
+
+    processedAssignments = []
+    for assignment in numberAssignments:
+        processedAssignments.append(assignment)
+
+    for assignment in stringAssignments:
+        # print(assignment)
+        m = re.findall('^[a-zA-Z][a-zA-Z0-9\_]*=([a-zA-Z].*)$', assignment)
+        if m:
+            assignment = re.sub(r"^([a-zA-Z][a-zA-Z0-9\_]*=)([a-zA-Z].*)$", r'\1"\2"', assignment)
+            # print(assignment)
+            processedAssignments.append(assignment)
+
+    for assignment in arraysAssignments:
+        stringRegexp = "[\,\]\[]((?![\d\+\-\ ]+)[^\[^\]^\"^\'^\,]+)[\,\[\]]"
+        m = re.search(stringRegexp, assignment)
+        while m:
+            assignment = assignment[:m.span()[0]+1] + "\"" + m.groups()[0] + "\"" + assignment[m.span()[1]-1:]
+            m = re.search(stringRegexp, assignment)
+        processedAssignments.append(assignment)
+    
+    return (targetName, [assignment for assignment in processedAssignments])
 
 def countLeadingSymbols(line, symbol):
     counter = 0
@@ -127,3 +161,5 @@ def removeShiftings(text):
         return cleanText
     else:
         return text
+
+

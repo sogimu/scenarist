@@ -1,3 +1,13 @@
+[a]
+    print(param)
+    a = "b::param=%s" % str(param)
+    # b = "b::param=[\"a\"]"
+    print(a)
+    runTarget(a)
+    # runShell('./scenarist.py run b::param=%s' % str(param))
+[b]
+    print(param)
+
 [default]
     try:
         if len(imageName) == 0: raise
@@ -35,7 +45,7 @@
     f.close()
 
 [make_package]
-    runShell("rm -rf dist")
+    runShell("sudo rm -rf dist")
     runShell("python2 setup.py sdist")
     with cd("dist"):
         runShell("bash -c 'ls | xargs -I {} ln -s {} build_scenarist_latest.tar.gz'")

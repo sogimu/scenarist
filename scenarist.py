@@ -130,6 +130,11 @@ if __name__ == '__main__':
         else:
             scriptVariant = namespace.script[:-1 * len(build_scenarist.scriptNameEnding)]
 
+        if scriptVariant == None:
+            print build_scenarist.bcolors.FAIL + "No scripts found!" + build_scenarist.bcolors.ENDC
+            sys.stdout.flush()
+            exit()
+            
         build_scenarist.global_vars["scriptVariant"] = scriptVariant
 
         pathToScript = os.path.join(userScriptsDir, scriptVariant + build_scenarist.scriptNameEnding)
