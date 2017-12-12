@@ -85,7 +85,7 @@ def splitTargetCallToNameAndParams(targetCall):
 
         numberAssignments = re.findall(r"([a-zA-Z][^,^=]*\=[\-\+]?[0-9\.]+)", assignmentsPart[0])
         stringAssignments  = re.findall(r"((?![a-zA-Z][^,^=]*\=[\d\+\-]+)[a-zA-Z][^\,^\=]*\=[^\,^\[^\]]+)", assignmentsPart[0])
-        arraysAssignments  = re.findall(r"([a-zA-Z][^,^=]*\=\[[0-9a-zA-Z\"\'\.\,\ \[\]\_\/]+\])", assignmentsPart[0])
+        arraysAssignments  = re.findall(r"([a-zA-Z][^,^=]*\=\[.+\])", assignmentsPart[0])
 
     # print("stringAssignments ", stringAssignments)
     # print("numberAssignments ", numberAssignments)
