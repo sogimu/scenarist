@@ -97,11 +97,11 @@ def splitTargetCallToNameAndParams(targetCall):
 
     for assignment in stringAssignments:
         # print(assignment)
-        m = re.findall('^[a-zA-Z][a-zA-Z0-9\_]*=([a-zA-Z].*)$', assignment)
+        m = re.findall('^([a-zA-Z][a-zA-Z0-9\_]*=)([^\"^]+)$', assignment)
         if m:
-            assignment = re.sub(r"^([a-zA-Z][a-zA-Z0-9\_]*=)([a-zA-Z].*)$", r'\1"\2"', assignment)
+            assignment = re.sub(r"^([a-zA-Z][a-zA-Z0-9\_]*=)([^\"^]+)$", r'\1"\2"', assignment)
             # print(assignment)
-            processedAssignments.append(assignment)
+        processedAssignments.append(assignment)
 
     for assignment in arraysAssignments:
         stringRegexp = "[\,\]\[]((?![\d\+\-\ ]+)[^\[^\]^\"^\'^\,]+)[\,\[\]]"

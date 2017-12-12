@@ -62,7 +62,7 @@ def executeTargets(p_targets, pathToScript):
     if isFaill == False:
         targetsCode = getTargets(pathToScript)
         for target, params in p_targets:
-            print bcolors.OKGREEN + "Target " + target + "..." + bcolors.ENDC
+            print bcolors.OKGREEN + "Target " + target + ":" + ",".join(params) + bcolors.ENDC
             sys.stdout.flush()
             code = "from build_scenarist.runner import runTarget\n"
             for paramCode in params:
