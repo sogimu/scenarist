@@ -1,59 +1,3 @@
-[test_helperA]
-    print(param)
-    runTarget("test_helperB::param=%s" % str(param).replace(' ',''))
-    runShell("./scenarist.py run test_helperB::param=%s" % str(param).replace(' ',''))
-
-[test_helperB]
-    print(param)
-
-[test]
-    # проверка на числа
-    runTarget("test_helperB:param=1")
-    runTarget("test_helperB::param=12")
-    runTarget("test_helperB::param=1.1")
-    runTarget("test_helperB::param=12.1")
-    runTarget("test_helperB::param=12.12")
-
-    # проверка на строки
-    runTarget("test_helperB::param=abc")
-    runTarget("test_helperB::param=\"abc\"")
-    runTarget('test_helperB::param=\'abc\'')
-    runTarget("test_helperB::param=\'abc\'")
-    runTarget("test_helperB::param='abc'")
-
-    # проверка на массивы
-    runTarget("test_helperA::param=[1]")
-    runTarget("test_helperA::param=[12]")
-    runTarget("test_helperA::param=[1.1]")
-    runTarget("test_helperA::param=[12.12]")
-    runTarget("test_helperA::param=[1,2]")
-    runTarget("test_helperA::param=[1.1,2.1]")
-    runTarget("test_helperA::param=[12,22]")
-    runTarget("test_helperA::param=[12.1,22.1]")
-    runTarget("test_helperA::param=[a]")
-    runTarget("test_helperA::param=[a/b]")
-    runTarget("test_helperA::param=[\"a\"]")
-    runTarget("test_helperA::param=[\"a/b\"]")
-    runTarget("test_helperA::param=[a,b]")
-    runTarget("test_helperA::param=[a,b,1]")
-    runTarget("test_helperA::param=[\"a\",\"b\"]")
-    runTarget("test_helperA::param=[ab]")
-    runTarget("test_helperA::param=[c:d]")
-    runTarget("test_helperA::param=[\"ab\"]")
-    runTarget("test_helperA::param=[\"c:d\"]")
-    runTarget("test_helperA::param=[ab,ab]")
-    runTarget("test_helperA::param=[\"ab\",\"ab\"]")
-    runTarget("test_helperA::param=[\"ab\",\"ab\", 1]")
-    runTarget("test_helperA::param=[\"ab\",\"ab\", 12]")
-    runTarget("test_helperA::param=[\"ab\",\"ab\", 12.12]")
-
-    # множественные параметры
-    runTarget("test_helperB::param0=1,param=42")
-    runTarget("test_helperB::param0=a,param=b")
-    
-    # множественные цели с параметрами
-    runShell("./scenarist.py run test_helperB:param=1 test_helperB:param=42")
-
 [default]
     try:
         if len(imageName) == 0: raise
@@ -67,7 +11,7 @@
     except:
         deploy=False
 
-    runTarget("in_container:container=\"%s:%s\", targets=[\"install_deps\", \"build\"]" % (imageName, imageTag))
+    runTarget("in_container:container=\"%s:%s\", targets=[\"install_deps\", \"test\", \"build\"]" % (imageName, imageTag))
 
     if deploy != False:
         runTarget("deploy_package:host=\"sogimu.fvds.ru\",folder=\"build_scenarst/\"")
@@ -143,3 +87,59 @@
             scenarist.py run %s
         '
         """ % (os.getcwd(), container, "  ".join(targets)))
+
+[test_helperA]
+    print(param)
+    runTarget("test_helperB::param=%s" % str(param).replace(' ',''))
+    runShell("./scenarist.py run test_helperB::param=%s" % str(param).replace(' ',''))
+
+[test_helperB]
+    print(param)
+
+[test]
+    # проверка на числа
+    runTarget("test_helperB:param=1")
+    runTarget("test_helperB::param=12")
+    runTarget("test_helperB::param=1.1")
+    runTarget("test_helperB::param=12.1")
+    runTarget("test_helperB::param=12.12")
+
+    # проверка на строки
+    runTarget("test_helperB::param=abc")
+    runTarget("test_helperB::param=\"abc\"")
+    runTarget('test_helperB::param=\'abc\'')
+    runTarget("test_helperB::param=\'abc\'")
+    runTarget("test_helperB::param='abc'")
+
+    # проверка на массивы
+    runTarget("test_helperA::param=[1]")
+    runTarget("test_helperA::param=[12]")
+    runTarget("test_helperA::param=[1.1]")
+    runTarget("test_helperA::param=[12.12]")
+    runTarget("test_helperA::param=[1,2]")
+    runTarget("test_helperA::param=[1.1,2.1]")
+    runTarget("test_helperA::param=[12,22]")
+    runTarget("test_helperA::param=[12.1,22.1]")
+    runTarget("test_helperA::param=[a]")
+    runTarget("test_helperA::param=[a/b]")
+    runTarget("test_helperA::param=[\"a\"]")
+    runTarget("test_helperA::param=[\"a/b\"]")
+    runTarget("test_helperA::param=[a,b]")
+    runTarget("test_helperA::param=[a,b,1]")
+    runTarget("test_helperA::param=[\"a\",\"b\"]")
+    runTarget("test_helperA::param=[ab]")
+    runTarget("test_helperA::param=[c:d]")
+    runTarget("test_helperA::param=[\"ab\"]")
+    runTarget("test_helperA::param=[\"c:d\"]")
+    runTarget("test_helperA::param=[ab,ab]")
+    runTarget("test_helperA::param=[\"ab\",\"ab\"]")
+    runTarget("test_helperA::param=[\"ab\",\"ab\", 1]")
+    runTarget("test_helperA::param=[\"ab\",\"ab\", 12]")
+    runTarget("test_helperA::param=[\"ab\",\"ab\", 12.12]")
+
+    # множественные параметры
+    runTarget("test_helperB::param0=1,param=42")
+    runTarget("test_helperB::param0=a,param=b")
+    
+    # множественные цели с параметрами
+    runShell("./scenarist.py run test_helperB:param=1 test_helperB:param=42")
