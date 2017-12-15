@@ -74,6 +74,8 @@ def splitTargetCallToNameAndParams(targetCall):
     if len(targetNamePart) == 1:
         targetName = targetNamePart[0]
 
+    # print(targetCall)
+
     assignmentsPart = re.findall("^[a-zA-Z][a-zA-Z0-9\_]*:*(.+)$", targetCall)
 
     # print(assignmentsPart)
@@ -85,7 +87,7 @@ def splitTargetCallToNameAndParams(targetCall):
 
         numberAssignments = re.findall(r"([a-zA-Z][^,^=]*\=[\-\+]?[0-9\.]+)", assignmentsPart[0])
         stringAssignments  = re.findall(r"((?![a-zA-Z][^,^=]*\=[\d\+\-]+)[a-zA-Z][^\,^\=]*\=[^\,^\[^\]]+)", assignmentsPart[0])
-        arraysAssignments  = re.findall(r"([a-zA-Z][^,^=]*\=\[.+\])", assignmentsPart[0])
+        arraysAssignments  = re.findall(r"([a-zA-Z][^\,^\=]*\=\[[^\[^\]]*\])", assignmentsPart[0])
 
     # print("stringAssignments ", stringAssignments)
     # print("numberAssignments ", numberAssignments)
@@ -96,19 +98,11 @@ def splitTargetCallToNameAndParams(targetCall):
         processedAssignments.append(assignment)
 
     for assignment in stringAssignments:
-        # print(assignment)
-        m = re.findall('^([a-zA-Z][a-zA-Z0-9\_]*=)([^\"^]+)$', assignment)
-        if m:
-            assignment = re.sub(r"^([a-zA-Z][a-zA-Z0-9\_]*=)([^\"^]+)$", r'\1"\2"', assignment)
-            # print(assignment)
+        assignment = re.sub(r"^([a-zA-Z][a-zA-Z0-9\_]*=)([^\"]+)$", r'\1"\2"', assignment)
         processedAssignments.append(assignment)
 
     for assignment in arraysAssignments:
-        stringRegexp = "[\,\]\[]((?![\d\+\-\ ]+)[^\[^\]^\"^\'^\,]+)[\,\[\]]"
-        m = re.search(stringRegexp, assignment)
-        while m:
-            assignment = assignment[:m.span()[0]+1] + "\"" + m.groups()[0] + "\"" + assignment[m.span()[1]-1:]
-            m = re.search(stringRegexp, assignment)
+        assignment = re.sub(r"^([a-zA-Z][a-zA-Z0-9\_]*=)\[([^\"]+)\]$", r'\1["\2"]', assignment)
         processedAssignments.append(assignment)
     
     return (targetName, [assignment for assignment in processedAssignments])
