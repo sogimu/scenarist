@@ -1,4 +1,4 @@
-__version__ = "0.9.0-1-g24d7-dirty"
+__version__ = "0.10.3"
 from .info import Info
 from .utility import getScriptsVariants, chooseScriptVariant, splitTargetCallToNameAndParams
 from .runner import executeTargets

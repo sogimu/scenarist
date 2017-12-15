@@ -143,6 +143,9 @@
     runShell("./scenarist.py run test_helperA:param=[\"ab\",\"ab\",12]")
     runShell("./scenarist.py run test_helperA:param=[\"ab\",\"ab\",12.12]")
 
+    # передача массивов содержащих строки похожие на передачау параметра
+    runShell("./scenarist.py run test_helperA:param=[ab:a=1,b=2]")
+
     # множественные параметры
     runShell("./scenarist.py run test_helperB:param0=1,param=42")
     runShell("./scenarist.py run test_helperB:param0=a,param=b")
