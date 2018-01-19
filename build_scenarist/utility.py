@@ -34,14 +34,19 @@ def runShell(cmd, fallAtFail=True):
     sys.stdout.write("\n" + bcolors.HEADER + "shell: " + bcolors.ENDC + "\n")
     sys.stdout.write(bcolors.BOLD + cmd + bcolors.ENDC + "\n")
     sys.stdout.flush()
-    retCode = subprocess.call(shlex.split(cmd))
+    
+    p = subprocess.Popen(shlex.split(cmd))
+    output, error = p.communicate()
+    retCode = p.returncode
+
+    # retCode = subprocess.call(shlex.split(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if retCode != 0 and fallAtFail:
         sys.stdout.write("\nShell code failed with code: " + str(retCode) + "\n")
         sys.stdout.flush()
         sys.exit(retCode)
     sys.stdout.write("\n")
     sys.stdout.flush()
-    return retCode
+    return {"retCode": retCode, "output": output, "error": error}
 
 def runPythonCode(code):
     # sys.stdout.write("\n" + bcolors.HEADER + "python >" + bcolors.ENDC + "\n")
@@ -74,16 +79,16 @@ def splitTargetCallToNameAndParams(targetCall):
     if len(targetNamePart) == 1:
         targetName = targetNamePart[0]
 
-    # print(targetCall)
+    # print targetCall
 
-    assignmentsPart = re.findall("^[a-zA-Z][a-zA-Z0-9\_]*:*(.+)$", targetCall)
+    assignmentsPart = re.findall("^[a-zA-Z][a-zA-Z0-9\_]*:*(.*)$", targetCall)
 
     # print(assignmentsPart)
+    stringAssignments  = []
+    numberAssignments = []
+    arraysAssignments  = []
 
     if len(assignmentsPart) == 1:
-        stringAssignments  = []
-        numberAssignments = []
-        arraysAssignments  = []
 
         numberAssignments = re.findall(r"([a-zA-Z][^,^=^:]*\=[\-\+]?[0-9\.]+)", assignmentsPart[0])
         stringAssignments  = re.findall(r"((?![a-zA-Z][^,^=^:]*\=[\d\+\-]+)[a-zA-Z][^,^=^:]*\=[^\,^\[^\]]+)", assignmentsPart[0])
@@ -93,6 +98,9 @@ def splitTargetCallToNameAndParams(targetCall):
     # print("numberAssignments ", numberAssignments)
     # print("arraysAssignments ", arraysAssignments)
 
+    # print assignmentsPart
+
+    # processedAssignments = assignmentsPart
     processedAssignments = []
     for assignment in numberAssignments:
         processedAssignments.append(assignment)

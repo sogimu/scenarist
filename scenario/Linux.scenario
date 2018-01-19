@@ -1,3 +1,8 @@
+[aaa]
+    # out = runShell("ls")
+    out = runShell("bash -c \"((terminator) & jobs -p)\"")
+    print(out["output"])
+
 [default]
     try:
         if len(imageName) == 0: raise
@@ -41,6 +46,7 @@
         runShell("bash -c 'ls | xargs -I {} ln -s {} build_scenarist_latest.tar.gz'")
 
 [build]
+    print("wef")
     runTarget("extract_version")
     runTarget("make_package")
 
@@ -83,8 +89,8 @@
         sudo docker run -v %s:/repo %s bash -cex '
             pip install -U build_scenarist
             cd /repo
-            scenarist.py info
-            scenarist.py run %s
+            ./scenarist.py info
+            ./scenarist.py run %s
         '
         """ % (os.getcwd(), container, "  ".join(targets)))
 
@@ -153,3 +159,8 @@
     
     # множественные цели с параметрами
     runShell("./scenarist.py run test_helperB:param=1 test_helperB:param=42")
+
+    # Возврат output, error, retCode
+    out = runShell("ls")
+    # print(out["output"])
+    print(out)

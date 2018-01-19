@@ -143,6 +143,8 @@ if __name__ == '__main__':
         if userScriptsDir != None and scriptVariant != None and namespace.targets != None:
             if os.path.isfile(pathToScript):
                 if namespace.targets != None:
+                    # print namespace.targets
+                    # print targets
                     print build_scenarist.bcolors.HEADER + "Run target's " + build_scenarist.bcolors.ENDC + build_scenarist.bcolors.BOLD + ' '.join(namespace.targets) + build_scenarist.bcolors.ENDC + build_scenarist.bcolors.HEADER + " of script: " + os.path.abspath(pathToScript) + build_scenarist.bcolors.ENDC
                     sys.stdout.flush()
                     build_scenarist.executeTargets(targets, pathToScript)
