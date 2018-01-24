@@ -1,5 +1,5 @@
-__version__ = "0.10.1-3-gfedd-dirty"
+__version__ = "0.11.0-dirty"
 from .info import Info
 from .utility import getScriptsVariants, chooseScriptVariant, splitTargetCallToNameAndParams
-from .runner import executeTargets
+from .runner import executeTargets, getTargets
 from .config import bcolors, scriptNameEnding, scriptsDir, global_vars

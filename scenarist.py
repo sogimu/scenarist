@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
- 
+# PYTHON_ARGCOMPLETE_OK
+
 import sys
 import argparse
+import argcomplete
 import re
 import subprocess
 import os.path
@@ -41,7 +43,23 @@ def createParser ():
             epilog = '''Lizin Aleksandr aka sogimu, email: sogimu@nxt.ru, 2017''',
             add_help = True
             )
- 
+
+    def github_org_members(prefix, parsed_args, **kwargs):
+        info = build_scenarist.Info()
+        fullPlatformName = info.fullPlatformName()
+
+        # print build_scenarist.scriptsDir
+
+        scenarioVariants = build_scenarist.getScriptsVariants(build_scenarist.scriptsDir)
+        scriptVariant = build_scenarist.chooseScriptVariant(fullPlatformName, scenarioVariants)
+        pathToScript = os.path.join(build_scenarist.scriptsDir, scriptVariant + build_scenarist.scriptNameEnding)
+        # print(pathToScript)
+        # print(build_scenarist.getTargets(pathToScript).keys())
+
+        return build_scenarist.getTargets(pathToScript).keys()
+    
+    # parser.add_argument("--member", help="GitHub member").completer = github_org_members
+
     # Создаем группу параметров для родительского парсера,
     # ведь у него тоже должен быть параметр --help / -h
     parent_group = parser.add_argument_group (title='Settings')
@@ -56,7 +74,6 @@ def createParser ():
             title = 'Commands',
             description = 'Commands for first param %(prog)s')
 
-
     # Создаем парсер для команды create_config
     create_run_parser = subparsers.add_parser ('run',
             add_help = True,
@@ -67,15 +84,15 @@ def createParser ():
     run_group = create_run_parser.add_argument_group (title='run')
     # Добавляем параметры
     run_group.add_argument ('targets', type=str, nargs='+',
-            help = 'Specify targets in script to run. The script will be choosen by current platform name or with help argument -os')
+            help = 'Specify targets in script to run. The script will be choosen by current platform name or with help argument -os').completer = github_org_members
 
-    run_group.add_argument ('--script', '-s', type=script_name_parse, required=False,
+    run_group.add_argument ('--script', type=script_name_parse, required=False,
             help = "Specify script name for which os run. Example: Ubuntu_16.04. Format: " + "^(.+" + build_scenarist.scriptNameEnding + ")$" + ". Default script name on this platform is " + info.fullPlatformName())
 
-    run_group.add_argument ('--scriptDir', '-d', type=real_path_to_dir, default=build_scenarist.scriptsDir, required=False,
+    run_group.add_argument ('--scriptDir', type=real_path_to_dir, default=build_scenarist.scriptsDir, required=False,
             help = 'Path to directory with scenario. Example: ./scenario/')
 
-    run_group.add_argument ('--workspace', '-w', type=path_to_dir, required=False,
+    run_group.add_argument ('--workspace', type=path_to_dir, required=False,
             help = "Specify path to dir where script should be run. Example: /repo")
 
     # Создаем парсер для команды create_config
@@ -85,13 +102,34 @@ def createParser ():
             description = '''Command for geting info about current platform''')
 
     # Создаем новую группу параметров
-    info_group = create_run_parser.add_argument_group (title='info')
+    # info_group = create_run_parser.add_argument_group (title='info')
+    # info_group.completer = github_org_members
     
     return parser
 
 if __name__ == '__main__':
     parser = createParser()
-    namespace = parser.parse_args(sys.argv[1:])
+    # namespace = parser.parse_args(sys.argv[1:])
+    # namespace = parser.parse_args()
+
+    # parser = argparse.ArgumentParser(
+    #         prog = 'scenarist',
+    #         description = '''Utility for running platform specific scenario''',
+    #         epilog = '''Lizin Aleksandr aka sogimu, email: sogimu@nxt.ru, 2017''',
+    #         add_help = True
+    #         )
+
+    # def github_org_members(prefix, parsed_args, **kwargs):
+    #     # resource = "https://api.github.com/orgs/{org}/members".format(org=parsed_args.organization)
+    #     # return (member['login'] for member in requests.get(resource).json() if member['login'].startswith(prefix))
+    #     return ["abc", "dfg"]
+    
+    # parser.add_argument("--member", help="GitHub member").completer = github_org_members
+
+    argcomplete.autocomplete(parser)
+    namespace = parser.parse_args()
+
+    # print "https://api.github.com/users/{m}".format(m=args.member)
  
     if namespace.command == "run":
         # print namespace.os
@@ -117,7 +155,7 @@ if __name__ == '__main__':
 
         # scriptDir
         if namespace.scriptDir == None:
-            userScriptsDir = scenarioDir
+            userScriptsDir = scriptsDir
         else:
             userScriptsDir = namespace.scriptDir
 
@@ -127,6 +165,9 @@ if __name__ == '__main__':
         if namespace.script == None:
             scenarioVariants = build_scenarist.getScriptsVariants(userScriptsDir)
             scriptVariant = build_scenarist.chooseScriptVariant(fullPlatformName, scenarioVariants)
+            pathToScript = os.path.join(userScriptsDir, scriptVariant + build_scenarist.scriptNameEnding)
+            print(pathToScript)
+            print(build_scenarist.getTargets(pathToScript).keys())
         else:
             scriptVariant = namespace.script[:-1 * len(build_scenarist.scriptNameEnding)]
 
