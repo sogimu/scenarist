@@ -1,0 +1,3 @@
+[test_a]
+    print("Ubuntu_16.04")
+    runTarget("test_helperB:param=1")

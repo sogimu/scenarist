@@ -1,24 +1,66 @@
 # -*- coding: UTF-8 -*-
  
 import sys
-import argparse
 import re
 import os
-import platform
-
-from subprocess import call
+import Queue
 import subprocess
-import shlex
 
-from os.path import exists
-from os import makedirs
+from utility import splitTargetCallToNameAndParams
+from info    import Info
+from config  import bcolors, defaultScenarioNameEnding, defaultScenarioDir
 
-from build_scenarist.utility import cd, runShell, runPythonCode, splitTargetCallToNameAndParams, removeShiftings
-from build_scenarist.info import Info
-from build_scenarist.config import bcolors, global_vars
+def countLeadingSymbols(line, symbol):
+    counter = 0
+    for i in line:
+        if i == symbol:
+            counter+=1
+        else:
+            break
+    return counter
 
-def getTargets(pathToScript):
-    with open(pathToScript) as f:
+def calculateShiftings(text, symbol):
+    shiftings = []
+    for i in text.split('\n'):
+        if len(i) != 0:
+            shiftings.append(countLeadingSymbols(i, symbol))
+
+    return shiftings
+
+def findMinimumShiftingLength(shiftings):
+    minimumShiftingLength = sys.maxint
+    for i in shiftings:
+        if i < minimumShiftingLength:
+            minimumShiftingLength = i
+    if minimumShiftingLength != sys.maxint:
+        return minimumShiftingLength
+    else:
+        return 0
+
+def removeShiftings(text):
+    shiftingsByTabs   = calculateShiftings(text, '\t')
+    shiftingsBySpaces = calculateShiftings(text, ' ')
+    minimumShiftingLengthByTabs   = findMinimumShiftingLength(shiftingsByTabs)
+    minimumShiftingLengthBySpaces = findMinimumShiftingLength(shiftingsBySpaces)
+
+    if minimumShiftingLengthByTabs > 0:
+        minimumShiftingLength = minimumShiftingLengthByTabs
+    else:
+        minimumShiftingLength = minimumShiftingLengthBySpaces
+
+    if minimumShiftingLength > 0:
+        cleanText = ""
+        for i in text.split('\n'):
+            cleanLine = i
+            if len(i) != 0:
+                cleanLine = i[minimumShiftingLength:]
+            cleanText += cleanLine + '\n'
+        return cleanText
+    else:
+        return text
+
+def getTargets(pathToScenario):
+    with open(pathToScenario) as f:
         content = f.readlines()
 
     targetPositions = []
@@ -41,40 +83,60 @@ def getTargets(pathToScript):
         targets[targetName] = targetCode
     return targets
 
-def targetsNotInScript(targets, pathToScript):
-    targetsCode = getTargets(pathToScript)
-    result = []
-    for target, params in targets:
-        if not(target in targetsCode):
-            result.append(target)
-    return result
+def isTargetExist(target, pathToScenario):
+    targetsCode = getTargets(pathToScenario)
+    return target in targetsCode
 
-def executeTargets(p_targets, pathToScript):
-    notFoundTargets = targetsNotInScript(p_targets, pathToScript)
+def scenarioPath(scenarioName, scenarioDir=defaultScenarioDir, defaultScenarioNameEnding=defaultScenarioNameEnding):
+    return os.path.join(scenarioDir, scenarioName + defaultScenarioNameEnding)
 
-    isFaill = False
-    if len(notFoundTargets) != 0:
-        for target in notFoundTargets:
-            isFaill = True
-            print bcolors.FAIL + "\nError: Target %s not found in %s" % (target, pathToScript) + bcolors.ENDC
+def compatibleScenariosPathes():
+    info = Info()
+    pathes = []
+    path = scenarioPath(info.osName()+"_"+info.distName()+"_"+info.distVersion())
+    if os.path.isfile(path):
+        pathes.append(path)
+
+    path = scenarioPath(info.osName()+"_"+info.distName())
+    if os.path.isfile(path):
+        pathes.append(path)
+
+    path = scenarioPath(info.osName())
+    if os.path.isfile(path):
+        pathes.append(path)
+
+    return pathes
+
+def runTargets(targets, scenarioDir=defaultScenarioDir):
+    targetsQueue = Queue.Queue()
+    for targetCall in targets:
+        targetAndParams = splitTargetCallToNameAndParams(targetCall)
+        targetsQueue.put(targetAndParams)
+
+    notFoundTargets = []
+
+    while not targetsQueue.empty():
+        target, params = targetsQueue.get()
+        targetFound = False
+        for scenarioPath in compatibleScenariosPathes():
+            if isTargetExist(target, scenarioPath):
+                if len(params)>0:
+                    print (bcolors.OKGREEN + "Target \"" + target + ":" + ",".join(params)+"\"" + bcolors.ENDC)
+                else:
+                    print (bcolors.OKGREEN + "Target \"" + target +"\"" + bcolors.ENDC)
+
+                targetsCode = getTargets(scenarioPath)
+                sys.stdout.flush()
+                code = "from scenario_help_utils import runTarget, runShell, cd\n"
+                code += "from os.path import exists\n"
+                code += "from os import makedirs\n"
+                for paramCode in params:
+                    code += "%s\n" % (paramCode)
+                code += removeShiftings(targetsCode[target])
+                exec(code)
+                targetFound = True
+                break
+        if targetFound == False:
+            print (bcolors.FAIL + "\nError: Target \"%s\" not found" % (target) + bcolors.ENDC)
             sys.stdout.flush()
-
-    if isFaill == False:
-        targetsCode = getTargets(pathToScript)
-        for target, params in p_targets:
-            print bcolors.OKGREEN + "Target " + target + ":" + ",".join(params) + bcolors.ENDC
-            sys.stdout.flush()
-            code = "from build_scenarist.runner import runTarget\n"
-            for paramCode in params:
-                code += "%s\n" % (paramCode)
-
-            code += removeShiftings(targetsCode[target])
-
-            runPythonCode(code)
-    else:
-        print bcolors.FAIL + "\nError: Please, specify existed targets name!" + bcolors.ENDC
-        sys.stdout.flush()
-
-def runTarget(targetCall):
-    nameAndParams = splitTargetCallToNameAndParams(targetCall)
-    executeTargets([nameAndParams], global_vars["pathToScript"])
+            break

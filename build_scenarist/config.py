@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
-scriptNameEnding = ".scenario"
-scriptsDir = "./scenario"
+defaultScenarioNameEnding = ".scenario"
+defaultScenarioDir = "./scenario"
 
 class bcolors:
     HEADER = '\033[95m'

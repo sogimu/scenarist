@@ -3,7 +3,7 @@ build_scenarist-*
 __pycache__/
 *.py[cod]
 *$py.class
-
+Dockerfile
 # C extensions
 *.so
 

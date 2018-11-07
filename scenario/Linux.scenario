@@ -56,25 +56,45 @@
 
 [default]
     try:
-        if len(imageName) == 0: raise
-    except: imageName="sogimu/astralinux"
-
-    try:
-        if len(imageTag) == 0: raise
-    except: imageTag="1.11"
+        if len(dockerImage) == 0: raise
+    except: dockerImage="sogimu/astralinux:1.11"
 
     try: deploy
     except:
         deploy=False
 
-    runTarget("in_container:container=\"%s:%s\", targets=[\"install_deps\", \"build\"]" % (imageName, imageTag))
+
+    def splitDockerImageName(dockerImage):
+        def extractNameAndTag(imageNameAndTag):
+            imageName_tag = imageNameAndTag.split(":")
+            if len(imageName_tag) == 2:
+                return imageName_tag[0], imageName_tag[1]
+            else:
+                return imageName_tag[0], None
+
+        dockerUser = None
+        dockerImageName = None
+        dockerImageTag = None
+
+        user_imageNameAndTag = dockerImage.split("/")
+        if len(user_imageNameAndTag) == 2:
+            dockerUser = user_imageNameAndTag[0]
+            dockerImageName, dockerImageTag = extractNameAndTag(user_imageNameAndTag[1])
+        else:
+            dockerImageName, dockerImageTag = extractNameAndTag(user_imageNameAndTag[0])
+
+        return dockerUser, dockerImageName, dockerImageTag
+
+    dockerUser, dockerImageName, dockerImageTag = splitDockerImageName(dockerImage)
+
+    runTarget("in_container:container=\"%s\", targets=[\"build\"]" % (dockerImage))
 
     if deploy != False:
         runTarget("deploy_package:host=\"sogimu.fvds.ru\",folder=\"build_scenarst/\"")
 
 [install_deps]
     runShell("apt-get update")
-    runShell("apt-get install -y python-dev")
+    runShell("apt-get install -y --allow-unauthenticated --no-install-recommends python-dev git ssh rsync")
 
 [extract_version]
     version = subprocess.check_output(["git", "describe", "--abbrev=4", "--tags", "--always", "--dirty"])
@@ -90,11 +110,17 @@
     f.write(fileText)
     f.close()
 
+
+[clean]
+    if exists("./dist"):
+        import shutil
+        shutil.rmtree("./dist")
+
 [make_package]
-    runShell("sudo rm -rf dist")
-    runShell("python2 setup.py sdist")
+    runTarget("clean")
+    runShell("python2 setup.py sdist bdist_wheel")
     with cd("dist"):
-        runShell("bash -c 'ls | xargs -I {} ln -s {} build_scenarist_latest.tar.gz'")
+        runShell("bash -c 'ls *.tar.gz | xargs -I {} ln -s {} build_scenarist_latest.tar.gz'")
 
 [build]
     runTarget("extract_version")
@@ -131,15 +157,67 @@
     except:
         raise Exception("Необходимо ввести имя docker-контейнера!")
 
-    try: targets
+    try: 
+        # Экранирует кавычки список целей на выполнение
+        for i in range(0, len(targets)):
+            targets[i] = str(targets[i]).replace("'", '\\"')
     except:
         raise Exception("Необходимо ввести список целей!")
 
+    from os.path import expanduser
+    homePath = expanduser("~")
+    id_rsaPath = os.path.join(homePath, ".ssh/id_rsa")
+    known_hostsPath = os.path.join(homePath, ".ssh/known_hosts")
+
+    f=open("/etc/timezone","r")
+    timezone = f.read()
+
+    f=open("Dockerfile","w")
+    f.write("""FROM %s
+    ADD scenario/ /scenario/
+    WORKDIR /  
+    RUN apt-get update && \\
+    apt-get install -y python wget sudo tzdata
+    
+    ENV TIMEZONE %s
+    RUN echo $TIMEZONE > /etc/timezone && \\
+        rm /etc/localtime && \\
+        ln -snf /usr/share/zoneinfo/$TIMEZONE /etc/localtime && \\
+        dpkg-reconfigure -f noninteractive tzdata
+
+    RUN if grep -q users /etc/group; \\
+    then \\
+         echo "Group 'user' exist"; \\
+    else \\
+        groupadd -g 100 users; \\
+    fi
+    
+    RUN if grep -q user /etc/passwd; \\
+    then \\
+        echo "User 'user' exist"; \\
+    else \\
+        useradd user --uid 1000 --gid 100 -m -s /bin/bash; \\
+    fi
+
+    RUN echo "user:12345678" | chpasswd && \\
+    adduser user sudo && \\
+    adduser root sudo && \\
+    cd /tmp && \\
+    wget https://bootstrap.pypa.io/get-pip.py && \\
+    python get-pip.py --force-reinstall && \\
+    cd / && \\
+    pip install -U build_scenarist
+    
+    RUN scenarist.py run install_deps""" % (container, timezone) )
+    f.close()
+
+    runShell("sudo docker pull %s" % container)
+    runShell("sudo docker build -t %s-pdp-dev ." % container)
+
     runShell("""
-        sudo docker run -v %s:/repo %s bash -cex '
-            pip install -U build_scenarist
-            cd /repo
-            scenarist.py info
-            scenarist.py run %s
-        '
-        """ % (os.getcwd(), container, "  ".join(targets)))
+            sudo docker run -u 1000 --rm -v %s:/home/user/.ssh/id_rsa:ro -v %s:/home/user/.ssh/known_hosts:ro -v /etc/hosts:/etc/hosts:ro -v \"%s\":/repo %s-pdp-dev bash -cex '
+                scenarist.py info
+                cd /repo
+                scenarist.py run %s
+            '
+        """ % (id_rsaPath, known_hostsPath, os.getcwd(), container, "  ".join(targets)))

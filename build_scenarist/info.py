@@ -3,7 +3,7 @@
 import os
 import platform
 import build_scenarist.utility
-from build_scenarist.config import scriptNameEnding
+from build_scenarist.config import defaultScenarioNameEnding
 
 class Info:
     def osName(self):
@@ -12,21 +12,30 @@ class Info:
     def distName(self):
         distName = "None_None"
         if self.osName() == "Linux":
-            distName = platform.dist()[0].replace('"', '')+'_'+platform.dist()[1].replace('"', '')
+            distName = platform.dist()[0].replace('"', '')
         elif self.osName() == "Windows":
-            distName = platform.win32_ver()[0].replace('"', '')+'_'+platform.win32_ver()[1].replace('"', '')
+            distName = platform.win32_ver()[0].replace('"', '')
         return distName
 
+    def distVersion(self):
+        distVersion = "None"
+        if self.osName() == "Linux":
+            distVersion = platform.dist()[1].replace('"', '')
+        elif self.osName() == "Windows":
+            distVersion = platform.win32_ver()[2].replace('"', '')
+        return distVersion
+
     def fullPlatformName(self):
-        return self.osName() + '_' + self.distName()
+        return self.osName() + '_' + self.distName() + '_' + self.distVersion()
 
     def defaultScriptName(self):
-        return self.fullPlatformName() + scriptNameEnding
+        return self.fullPlatformName() + defaultScenarioNameEnding
 
-    def scriptName(self, osName, distName, distVer):
-        return osName + '_' + distName + ' ' + distVer + scriptNameEnding
+    def scriptName(self, osName, distName, distVersion):
+        return osName + '_' + distName + ' ' + distVersion + defaultScenarioNameEnding
 
     def about_platform(self):
-        return """            OS name: {0}
-          Dist name: {1}
-Default script name: {2}""".format(self.osName(), self.distName(), self.defaultScriptName())
+        return """            OS name:    {0}
+          Dist name:    {1}
+          Dist version: {2}
+Default script name: {3}""".format(self.osName(), self.distName(), self.distVersion(), self.defaultScriptName())
