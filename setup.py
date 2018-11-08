@@ -27,7 +27,13 @@ setup(name='build_scenarist',
       author='Aleksandr Lizin',
       author_email='sogimu@nxt.ru',
       license='MIT',
-      packages=['build_scenarist'],
+      packages=find_packages(),
       scripts=['scenarist.py'],
       package_data={'build_scenarist': ['src/*']},
-      zip_safe=True)
+      zip_safe=True,
+      classifiers=[
+        "Programming Language :: Python :: 2.7",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+      ],
+      )
