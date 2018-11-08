@@ -13,7 +13,7 @@ Make-подобная утилита для выполнения платфор�
 ## Похожие утилиты
 * [dapp](https://github.com/flant/dapp)
 
-### Script have targets like [target_name]. Every target can be run with syntax like
+### Scenario have targets like [target_name]. Every target can be run with syntax like
 ```bash
 scenarist run target_name
 ```
@@ -22,10 +22,10 @@ If run scenarist like that:
 ```bash
 scenarist run target_name0 target_name1
 ```
-The Scenarist will choose more sutable script for current platform and run targets ```target_name0``` ```target_name1``` if they exist in the script
+The Scenarist will choose more sutable scenario for current platform and run targets ```target_name0``` ```target_name1``` if they exist in the scenario
 
 # Example
-## Targets from script with name Linux.script
+## Targets from scenario with name Linux.scenario
 ```python
 [install_deps]
 run("apt-get update")
@@ -49,8 +49,4 @@ with cd("./build/tests/"):
 ### if current platform is Linux
 ```bash
 scenarist run install_deps init build run_unit-tests
-```
-### or you can specify script manualy
-```bash
-scenarist run -script Linux.script install_deps init build run_unit-tests
 ```
