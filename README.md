@@ -53,7 +53,7 @@ with cd("./build/tests/"):
 ```
 ### How use
 ```bash
-scenarist run install_deps init build run_unit-tests
+scenarist.py run install_deps init build run_unit-tests
 ```
 
 ## Similar utilities
