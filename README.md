@@ -16,6 +16,9 @@ Make-like utility to execute platform-dependent scripts (scenarios) written in P
     * Linux.scenario
     Name of scenario gives ability to choose most suitabe scenario for current platform through comparison scenario name and platform properties.
 
+* Target-body shifting
+    Body of target may shifted to right by tabs of spacies.
+
 * Target inheritance
     If calling target not decribed in most suitable scenario for current platform, target will be searched in more general scenario.
     Example: if Linux_Ubuntu_16.04.scenario not consist target 'build' scenarist will try search 'build' in scenario Linux_Ubuntu.scenario.
