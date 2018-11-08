@@ -4,7 +4,7 @@
 
 Make-like utility to execute platform-dependent scripts (scenarios) written in Python 2.7. Format of scenario-name consist information about platform it written. Scenarios consist of targets.
 
-* Automatic script (scenario) selection for the current platform 
+* **Automatic script (scenario) selection for the current platform**
     File names of scenarios may consists up to three parts joined by '_' (underscore).
     Parts:
     * OS name - mandatory part. It can be Linux or Windows
@@ -16,22 +16,12 @@ Make-like utility to execute platform-dependent scripts (scenarios) written in P
     * Linux.scenario
     Name of scenario gives ability to choose most suitabe scenario for current platform through comparison scenario name and platform properties.
 
-* Target-body shifting
+* **Target-body shifting**
     Body of target may shifted to right by tabs of spacies.
 
-* Target inheritance
+* **Target inheritance**
     If calling target not decribed in most suitable scenario for current platform, target will be searched in more general scenario.
     Example: if Linux_Ubuntu_16.04.scenario not consist target 'build' scenarist will try search 'build' in scenario Linux_Ubuntu.scenario.
-
-* Scenarios have targets like [target_name]. Every target can be run with syntax like
-    ```bash
-    scenarist run target_name
-    ```
-    If run scenarist like that:
-    ```bash
-    scenarist run target_name0 target_name1
-    ```
-    The Scenarist will choose more sutable scenario for current platform and run targets ```target_name0``` ```target_name1``` if they exist in the scenario
 
 # Example
 ## Targets from scenario with name Linux.scenario
