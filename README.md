@@ -1,7 +1,5 @@
 # scenarist.py
 
-[![Build Status](http://sogimu.fvds.ru:8080/buildStatus/icon?job=scenarist.py/Astralinux_1.11)](http://sogimu.fvds.ru:8080/job/scenarist.py/job/Astralinux_1.11/) Astralinux 1.11, master
-
 ## Description
 Make-like utility to execute platform-dependent scripts (scenarios) written in Python 2.7. Format of scenario-name consist information about platform it written. Scenarios consist of targets.
 
@@ -51,7 +49,7 @@ with cd("./build"):
 with cd("./build/tests/"):
     run("./unit-tests/tests")
 ```
-### How use
+### How to use
 ```bash
 scenarist.py run install_deps init build run_unit-tests
 ```
