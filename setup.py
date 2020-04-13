@@ -4,9 +4,6 @@ import io
 import os
 import re
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
-
 def read(*names, **kwargs):
       with io.open(os.path.join(os.path.dirname(__file__), *names), encoding=kwargs.get("encoding", "utf8")) as fp:
             return fp.read()
@@ -22,8 +19,6 @@ setup(name="build_scenarist",
       keywords=["CI", "ci", "crossplatform", "build", "tool", "dev", "shell"],
       version=find_version("build_scenarist", "__init__.py"),
       description="Make-like utility to execute platform-dependent scripts (scenarios) written in Python 2.7. Format of scenario-name consist information about platform it written. Scenarios consist of targets",
-      long_description=long_description,
-      long_description_content_type="text/markdown",
       url="http://github.com/sogimu/scenarist",
       author="Aleksandr Lizin",
       author_email="sogimu@nxt.ru",
