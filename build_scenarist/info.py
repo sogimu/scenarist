@@ -15,6 +15,8 @@ class Info:
             distName = platform.dist()[0].replace('"', '')
         elif self.osName() == "Windows":
             distName = platform.win32_ver()[0].replace('"', '')
+        elif self.osName() == "Darwin":
+            distName = "MacOS"
         return distName
 
     def distVersion(self):
@@ -23,6 +25,9 @@ class Info:
             distVersion = platform.dist()[1].replace('"', '')
         elif self.osName() == "Windows":
             distVersion = platform.win32_ver()[2].replace('"', '')
+        elif self.osName() == "Darwin":
+            distVersion = platform.mac_ver()[0]
+
         return distVersion
 
     def fullPlatformName(self):
