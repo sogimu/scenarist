@@ -11,8 +11,16 @@ from . utility import splitTargetCallToNameAndParams
 from . config import bcolors, global_vars, defaultScenarioNameEnding, defaultScenarioDir
 from . runner import runTargets
 
-def runTarget(targetCall):
-    runTargets([targetCall])
+def runTarget(targetCall, scenarios = "*", scenarioDir=defaultScenarioDir):
+    if scenarios != "*":
+        scenariosFullPathes = []
+        for scenarioName in scenarios:
+            path = os.path.join(scenarioDir, scenarioName)
+            if os.path.isfile(path):
+                scenariosFullPathes.append(path)
+        scenarios = scenariosFullPathes
+
+    runTargets([targetCall], scenarios)
 
 def runShell(cmd, fallAtFail=True):
     sys.stdout.write("\n" + bcolors.HEADER + "shell: " + bcolors.ENDC + "\n")

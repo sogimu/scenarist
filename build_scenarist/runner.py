@@ -129,7 +129,7 @@ def compatibleScenariosPathes():
 
     return pathes
 
-def runTargets(targets, scenarioDir=defaultScenarioDir):
+def runTargets(targets, scenarios="*", scenarioDir=defaultScenarioDir):
     if sys.version_info[0] < 3:
         targetsQueue = Queue.Queue()
     else:
@@ -143,14 +143,17 @@ def runTargets(targets, scenarioDir=defaultScenarioDir):
     while not targetsQueue.empty():
         target, params = targetsQueue.get()
         targetFound = False
-        for scenarioPath in compatibleScenariosPathes():
-            if isTargetExist(target, scenarioPath):
+        if scenarios == "*":
+            scenarios = compatibleScenariosPathes()
+
+        for scenarioFullPath in scenarios:
+            if isTargetExist(target, scenarioFullPath):
                 if len(params)>0:
                     print (bcolors.OKGREEN + "Target \"" + target + ":" + ",".join(params)+"\"" + bcolors.ENDC)
                 else:
                     print (bcolors.OKGREEN + "Target \"" + target +"\"" + bcolors.ENDC)
 
-                targetsCode = getTargets(scenarioPath)
+                targetsCode = getTargets(scenarioFullPath)
                 sys.stdout.flush()
                 # code = "from scenario_help_utils import runTarget, runShell, cd\n"
                 code  = "from build_scenarist import runTarget, runShell, cd\n"

@@ -14,7 +14,7 @@ Make-like utility to execute platform-dependent scripts (scenarios) written in P
     * Linux_Ubuntu.scenario
     * Linux.scenario
     Name of scenario gives ability to choose most suitabe scenario for current platform through comparison scenario name and platform properties.
-
+    
 * **Target-body shifting**
     Body of target may shifted to right by tabs of spacies.
 

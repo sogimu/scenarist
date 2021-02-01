@@ -1,3 +1,72 @@
+[test111]
+    def availableScenariosForDockerImage(container):
+        import os
+        import re
+        import platform
+
+        def osName():
+            return platform.system().replace('"', '')
+        
+        def distName(osRelease):
+            distName = None
+            options = re.findall( r'.*=.*', osRelease)
+            optionsMap = {}
+            for option in options:
+                nameValue  = option.split('=')
+                optionsMap[nameValue[0]] = nameValue[1]
+
+            if "NAME" in optionsMap:
+                distName = optionsMap["NAME"].replace('"', '').replace(' ', '')
+            return distName
+
+        def distVersion(osRelease):
+            distVersion = None
+            options = re.findall( r'.*=.*', osRelease)
+            optionsMap = {}
+            for option in options:
+                nameValue  = option.split('=')
+                optionsMap[nameValue[0]] = nameValue[1]
+
+            if "VERSION_ID" in optionsMap:
+                distVersion = optionsMap["VERSION_ID"].replace('"', '').replace(' ', '')
+            return distVersion
+
+        import shlex
+        import subprocess
+        cmd = "sudo docker run %s cat /etc/os-release" % container
+        result = subprocess.run(shlex.split(cmd), stdout=subprocess.PIPE)
+
+        pathes = []
+        ###
+        path = osName()
+        if distName(result.stdout.decode('utf-8')):
+            path += '_' + distName(result.stdout.decode('utf-8')) + defaultScenarioNameEnding
+        if distVersion(result.stdout.decode('utf-8')):
+            path += '_' +  distVersion(result.stdout.decode('utf-8')) + defaultScenarioNameEnding
+            pathes.append(path)
+
+        ###
+        path = osName()
+        if distName(result.stdout.decode('utf-8')):
+            path += '_' + distName(result.stdout.decode('utf-8')) + defaultScenarioNameEnding
+            pathes.append(path)
+
+        ###
+        path = osName()
+        path += defaultScenarioNameEnding
+        pathes.append(path)
+
+        return pathes
+
+    container = "archlinux:latest"
+    scenarios = availableScenariosForDockerImage(container)
+
+    print(scenarios)
+
+    # scenarios = ["Linux_Ubuntu_16.04.scenario", "Linux_AstraLinux(Smolensk)_1.6.scenario"]
+
+    runTarget("install_deps", scenarios)
+
 [test_helperA]
     print(param)
     runTarget("test_helperB::param=%s" % str(param).replace(' ',''))
@@ -93,8 +162,9 @@
         runTarget("deploy_package:host=\"sogimu.fvds.ru\",folder=\"build_scenarst/\"")
 
 [install_deps]
-    runShell("apt-get update")
-    runShell("apt-get install -y --allow-unauthenticated --no-install-recommends python-dev git ssh rsync")
+    print("Just LINUX!")
+    # runShell("apt-get update")
+    # runShell("apt-get install -y --allow-unauthenticated --no-install-recommends python-dev git ssh rsync")
 
 [extract_version]
     version = subprocess.check_output(["git", "describe", "--abbrev=4", "--tags", "--always", "--dirty"])

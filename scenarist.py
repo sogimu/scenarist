@@ -91,9 +91,6 @@ if __name__ == '__main__':
     namespace = parser.parse_args(sys.argv[1:])
  
     if namespace.command == "run":
-        # print namespace.os
-        # print namespace.targets
-        # print namespace.dir
         info = build_scenarist.Info()
 
         fullPlatformName = info.fullPlatformName()
@@ -103,7 +100,7 @@ if __name__ == '__main__':
         if namespace.scriptDir:
             scenarioDir = namespace.scriptDir
 
-        build_scenarist.runTargets(namespace.targets, scenarioDir)
+        build_scenarist.runTargets(namespace.targets, "*", scenarioDir)
         
     elif namespace.command == "info":
         info = build_scenarist.Info()
