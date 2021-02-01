@@ -1,7 +1,7 @@
 # scenarist.py
 
 ## Description
-Make-like utility to execute platform-dependent scripts (scenarios) written in Python 2.7. Format of scenario-name consist information about platform it written. Scenarios consist of targets.
+Make-like utility to execute platform-dependent scripts (scenarios) written in Python 3.  A format of scenario-name consist information about platform it written. Scenarios consist of targets.
 
 * **Automatic script (scenario) selection for the current platform**
     File names of scenarios may consists up to three parts joined by '_' (underscore).

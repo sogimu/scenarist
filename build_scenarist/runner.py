@@ -1,14 +1,18 @@
 # -*- coding: UTF-8 -*-
- 
 import sys
 import re
 import os
-import Queue
 import subprocess
+import io
 
-from utility import splitTargetCallToNameAndParams
-from info    import Info
-from config  import bcolors, defaultScenarioNameEnding, defaultScenarioDir
+if sys.version_info[0] < 3:
+    import Queue
+else:
+    import queue
+
+from . utility import splitTargetCallToNameAndParams
+from . info    import Info
+from . config  import bcolors, defaultScenarioNameEnding, defaultScenarioDir
 
 def countLeadingSymbols(line, symbol):
     counter = 0
@@ -28,11 +32,11 @@ def calculateShiftings(text, symbol):
     return shiftings
 
 def findMinimumShiftingLength(shiftings):
-    minimumShiftingLength = sys.maxint
+    minimumShiftingLength = sys.maxsize
     for i in shiftings:
         if i < minimumShiftingLength:
             minimumShiftingLength = i
-    if minimumShiftingLength != sys.maxint:
+    if minimumShiftingLength != sys.maxsize:
         return minimumShiftingLength
     else:
         return 0
@@ -60,8 +64,13 @@ def removeShiftings(text):
         return text
 
 def getTargets(pathToScenario):
-    with open(pathToScenario) as f:
+    with io.open(pathToScenario, mode='r', encoding='utf-8') as f:
         content = f.readlines()
+
+    # utf8EncodedContent = []
+    # for line in content:
+    #     utf8EncodedContent.append(line.encode('utf-8'))
+    # print(utf8EncodedContent)
 
     targetPositions = []
     for lineIndex, text in enumerate(content):
@@ -91,24 +100,40 @@ def scenarioPath(scenarioName, scenarioDir=defaultScenarioDir, defaultScenarioNa
     return os.path.join(scenarioDir, scenarioName + defaultScenarioNameEnding)
 
 def compatibleScenariosPathes():
+    import json
     info = Info()
     pathes = []
-    path = scenarioPath(info.osName()+"_"+info.distName()+"_"+info.distVersion())
+    ###
+    path = info.osName()
+    if info.distName():
+        path += '_' + info.distName()
+    if info.distVersion():
+        path += '_' +  info.distVersion()
+    path = scenarioPath(path)
     if os.path.isfile(path):
         pathes.append(path)
 
-    path = scenarioPath(info.osName()+"_"+info.distName())
+    ###
+    path = info.osName()
+    if info.distName():
+        path += '_' + info.distName()
+    path = scenarioPath(path)
     if os.path.isfile(path):
         pathes.append(path)
 
-    path = scenarioPath(info.osName())
+    ###
+    path = info.osName()
+    path = scenarioPath(path)
     if os.path.isfile(path):
         pathes.append(path)
 
     return pathes
 
 def runTargets(targets, scenarioDir=defaultScenarioDir):
-    targetsQueue = Queue.Queue()
+    if sys.version_info[0] < 3:
+        targetsQueue = Queue.Queue()
+    else:
+        targetsQueue = queue.Queue()
     for targetCall in targets:
         targetAndParams = splitTargetCallToNameAndParams(targetCall)
         targetsQueue.put(targetAndParams)
@@ -127,12 +152,14 @@ def runTargets(targets, scenarioDir=defaultScenarioDir):
 
                 targetsCode = getTargets(scenarioPath)
                 sys.stdout.flush()
-                code = "from scenario_help_utils import runTarget, runShell, cd\n"
+                # code = "from scenario_help_utils import runTarget, runShell, cd\n"
+                code  = "from build_scenarist import runTarget, runShell, cd\n"
                 code += "from os.path import exists\n"
                 code += "from os import makedirs\n"
                 for paramCode in params:
                     code += "%s\n" % (paramCode)
                 code += removeShiftings(targetsCode[target])
+
                 exec(code)
                 targetFound = True
                 break

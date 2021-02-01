@@ -2,14 +2,14 @@
  
 import sys
 import os
-
-from subprocess import call
 import subprocess
 import shlex
 
-from build_scenarist.utility import splitTargetCallToNameAndParams
-from build_scenarist.config import bcolors, global_vars, defaultScenarioNameEnding, defaultScenarioDir
-from build_scenarist.runner import runTargets
+from subprocess import call
+
+from . utility import splitTargetCallToNameAndParams
+from . config import bcolors, global_vars, defaultScenarioNameEnding, defaultScenarioDir
+from . runner import runTargets
 
 def runTarget(targetCall):
     runTargets([targetCall])
